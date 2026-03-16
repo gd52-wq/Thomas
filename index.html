@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thomas' treningslogg 💪💪 🐾</title>
+    <style>
+        :root { 
+            --primary: #c0392b; 
+            --secondary: #2c3e50; 
+            --card: rgba(255, 255, 255, 0.92); 
+        }
+        
+        body { 
+            font-family: -apple-system, system-ui, sans-serif; 
+            margin: 0; 
+            padding: 10px;
+            min-height: 100vh;
+            background: url('bedlington.jpg') no-repeat center center fixed; 
+            background-size: cover;
+            color: #333;
+        }
+
+        .header { 
+            text-align: center; 
+            padding: 15px 0; 
+            background: rgba(44, 62, 80, 0.85); 
+            color: white; 
+            border-radius: 8px; 
+            margin-bottom: 20px; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        .container { max-width: 500px; margin: auto; }
+
+        select { 
+            width: 100%; 
+            padding: 15px; 
+            border-radius: 8px; 
+            font-size: 16px; 
+            margin-bottom: 20px; 
+            border: none; 
+            background: white; 
+            font-weight: bold; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            appearance: none;
+        }
+
+        .card { 
+            background: var(--card); 
+            border-radius: 12px; 
+            padding: 15px; 
+            margin-bottom: 15px; 
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2); 
+            border-left: 5px solid var(--primary); 
+        }
+
+        .ex-title { font-weight: bold; color: var(--secondary); font-size: 1.1em; display: block; margin-bottom: 5px; }
+        .ex-info { font-size: 0.9em; color: #444; margin-bottom: 5px; font-weight: 600; }
+        .ex-desc { font-size: 0.85em; color: #666; margin-bottom: 10px; line-height: 1.3; font-style: italic; }
+
+        .input-row { display: flex; gap: 10px; margin-top: 10px; }
+        input { 
+            flex: 1; 
+            padding: 12px; 
+            border: 1px solid #ccc; 
+            border-radius: 5px; 
+            font-size: 16px; 
+        }
+
+        .btn-save { 
+            padding: 10px 15px; 
+            background: var(--primary); 
+            color: white; 
+            border: none; 
+            border-radius: 5px; 
+            font-weight: bold; 
+            cursor: pointer;
+        }
+
+        .footer-btns { 
+            display: flex; 
+            gap: 10px; 
+            margin-top: 10px; 
+            border-top: 1px solid #eee; 
+            padding-top: 10px; 
+        }
+
+        .btn-small { 
+            background: #95a5a6; 
+            font-size: 0.75em; 
+            padding: 5px 10px; 
+            border: none; 
+            color: white; 
+            border-radius: 4px; 
+            cursor: pointer;
+        }
+
+        .history-area { 
+            margin-top: 10px; 
+            padding: 10px; 
+            background: #fdfdfd; 
+            border-radius: 5px; 
+            display: none; 
+            border: 1px solid #ddd; 
+        }
+
+        .history-item { 
+            font-size: 0.8em; 
+            display: flex; 
+            justify-content: space-between; 
+            border-bottom: 1px solid #eee; 
+            padding: 4px 0; 
+        }
+
+        .status-msg {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #27ae60;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            display: none;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+
+<div id="status" class="status-msg">Lagret i Google Sheets!</div>
+
+<div class="container">
+    <div class="header">
+        <h2 style="margin:0">Thomas' treningslogg 💪💪 🐾</h2>
+        <p style="margin:5px 0 0 0">🐾🐾🐾🐾🐾🐾🐾🐾</p>
+    </div>
+
+    <select id="dayToggle" onchange="updateView()">
+        <option value="1">Mandag: Tung bøy & Press</option>
+        <option value="2">Onsdag: Teknikk & Mark</option>
+        <option value="3">Fredag: Mengde & Variant</option>
+    </select>
+
+    <div id="workoutContent"></div>
+</div>
+
+<script>
+// DIN UNIKE GOOGLE SCRIPT URL
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby4uPV4nt98q4WdNB35VVkwJPqaiX5kXLQK5VMK3ZNsQ9jlSTSXg_0-S9H1jiqRiOFJ1w/exec'; 
+
+const program = {
+    "1": [
+        { id: "m1", t: "Magen", i: "3x30", d: "Valgfri (Situps/Benhev)." },
+        { id: "m2", t: "Rygghev", i: "3x12-15", d: "Hold vektskive inntil brystet." },
+        { id: "m3", t: "Styrkeløftknebøy", i: "1x7, 1x6, 1x5, 2x4, 2x3", d: "Vanlig bøy, finn god rytme." },
+        { id: "m4", t: "Benkpress m/stopp", i: "2x6, 2x5, 2x3", d: "1 sek markert stopp på brystet." },
+        { id: "m5", t: "Stiffleg Markløft", i: "2x8, 2x6", d: "Nesten strake bein, kjenn strekk i lår." },
+        { id: "m6", t: "Frontpress", i: "1x6, 2x5, 2x4", d: "Stående skulderpress fra brystet." }
+    ],
+    "2": [
+        { id: "o1", t: "Magen", i: "3x20", d: "Kontrollert utførelse." },
+        { id: "o2", t: "Rygghev", i: "3x10-12", d: "Litt tyngre enn mandag." },
+        { id: "o3", t: "Knebøy nakke m/stopp", i: "2x6, 2x5, 2x3", d: "Stangen høyt, stopp 1 sek i bunn." },
+        { id: "o4", t: "Benkpress m/stopp", i: "1x8, 2x6, 2x5, 2x4", d: "Husk stopp på hver rep." },
+        { id: "o5", t: "Markløft", i: "6x5", d: "Vanlig mark fra gulv." }
+    ],
+    "3": [
+        { id: "f1", t: "Magen", i: "3x25", d: "God kontakt med kjerne." },
+        { id: "f2", t: "Rygghev", i: "3x8-10", d: "Ukens tyngste rygghev." },
+        { id: "f3", t: "Knebøy nakke", i: "2x5, 4x4, 2x3", d: "Stanga høyt på nakken." },
+        { id: "f4", t: "Smal benkpress", i: "1x6, 2x5, 3x4", d: "Hendene i skulderbredde." },
+        { id: "f5", t: "Mark fra kloss", i: "3x5, 3x4", d: "Stang starter 5-10cm over gulv." },
+        { id: "f6", t: "Nakkepress", i: "5x4-6", d: "Fra nakken og rett opp." }
+    ]
+};
+
+function updateView() {
+    const day = document.getElementById('dayToggle').value;
+    const container = document.getElementById('workoutContent');
+    
+    container.innerHTML = program[day].map(ex => `
+        <div class="card">
+            <span class="ex-title">${ex.t}</span>
+            <div class="ex-info">${ex.i}</div>
+            <div class="ex-desc">${ex.d}</div>
+            <div class="input-row">
+                <input type="number" id="in-${ex.id}" placeholder="Vekt i kg" inputmode="decimal">
+                <button class="btn-save" onclick="save('${ex.id}', '${ex.t}')">Lagre</button>
+            </div>
+            <div class="footer-btns">
+                <button class="btn-small" onclick="toggleHistory('${ex.id}')">Logg (lokal)</button>
+            </div>
+            <div class="history-area" id="hist-area-${ex.id}">
+                <div id="hist-list-${ex.id}"></div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function save(id, exerciseName) {
+    const val = document.getElementById('in-' + id).value;
+    if(!val) return;
+
+    // 1. Lagre lokalt (for kjapp oversikt i appen)
+    const dateShort = new Date().toLocaleDateString('no-NO', {day:'2-digit', month:'2-digit'});
+    let localHistory = JSON.parse(localStorage.getItem('nsf_final_' + id)) || [];
+    localHistory.unshift({ weight: val, date: dateShort });
+    localStorage.setItem('nsf_final_' + id, JSON.stringify(localHistory.slice(0, 5)));
+
+    // 2. Send til Google Sheets via din Web App URL
+    fetch(SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        body: JSON.stringify({
+            exercise: exerciseName,
+            weight: val
+        })
+    }).then(() => showStatus());
+
+    document.getElementById('in-' + id).value = '';
+}
+
+function showStatus() {
+    const s = document.getElementById('status');
+    s.style.display = 'block';
+    setTimeout(() => s.style.display = 'none', 3000);
+}
+
+function toggleHistory(id) {
+    const area = document.getElementById('hist-area-' + id);
+    if(area.style.display === 'block') {
+        area.style.display = 'none';
+    } else {
+        area.style.display = 'block';
+        const list = document.getElementById('hist-list-' + id);
+        const hist = JSON.parse(localStorage.getItem('nsf_final_' + id)) || [];
+        list.innerHTML = hist.map(h => `
+            <div class="history-item">
+                <span>${h.date}</span>
+                <strong>${h.weight} kg</strong>
+            </div>
+        `).join('') || '<div style="font-size:0.8em">Ingen logg ennå</div>';
+    }
+}
+
+updateView();
+</script>
+</body>
+</html>
