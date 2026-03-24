@@ -33,17 +33,32 @@
 
         .container { max-width: 500px; margin: auto; }
 
-        select { 
-            width: 100%; 
-            padding: 15px; 
-            border-radius: 8px; 
-            font-size: 16px; 
+        /* Nye knapper for dagvelger */
+        .day-selector { 
+            display: flex; 
+            justify-content: center; 
+            gap: 15px; 
             margin-bottom: 20px; 
+        }
+
+        .btn-day { 
+            width: 60px; 
+            height: 60px; 
+            border-radius: 50%; 
             border: none; 
             background: white; 
+            color: var(--secondary); 
             font-weight: bold; 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-            appearance: none;
+            font-size: 1.2em; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2); 
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-day.active { 
+            background: var(--primary); 
+            color: white; 
+            transform: scale(1.1);
         }
 
         .card { 
@@ -137,11 +152,11 @@
         <p style="margin:5px 0 0 0">🐾🐾🐾🐾🐾🐾🐾🐾</p>
     </div>
 
-    <select id="dayToggle" onchange="updateView()">
-        <option value="1">Mandag: Tung bøy & Press</option>
-        <option value="2">Onsdag: Teknikk & Mark</option>
-        <option value="3">Fredag: Mengde & Variant</option>
-    </select>
+    <div class="day-selector">
+        <button id="btn-1" class="btn-day" onclick="updateView('1')">1</button>
+        <button id="btn-2" class="btn-day" onclick="updateView('2')">2</button>
+        <button id="btn-3" class="btn-day" onclick="updateView('3')">3</button>
+    </div>
 
     <div id="workoutContent"></div>
 </div>
@@ -176,8 +191,14 @@ const program = {
     ]
 };
 
-function updateView() {
-    const day = document.getElementById('dayToggle').value;
+function updateView(day) {
+    // Lagre valgt dag i minnet
+    localStorage.setItem('thomas_last_day', day);
+    
+    // Marker riktig knapp som aktiv
+    document.querySelectorAll('.btn-day').forEach(b => b.classList.remove('active'));
+    document.getElementById('btn-' + day).classList.add('active');
+
     const container = document.getElementById('workoutContent');
     
     container.innerHTML = program[day].map(ex => `
@@ -187,7 +208,7 @@ function updateView() {
             <div class="ex-desc">${ex.d}</div>
             <div class="input-row">
                 <input type="number" id="in-${ex.id}" placeholder="Vekt i kg" inputmode="decimal">
-                <button class="btn-save" onclick="save('${ex.id}', '${ex.t}')">Lagre</button>
+                <button class="btn-save" onclick="save('${ex.id}', '${ex.t}', '${day}')">Lagre</button>
             </div>
             <div class="footer-btns">
                 <button class="btn-small" onclick="toggleHistory('${ex.id}')">Logg (lokal)</button>
@@ -199,17 +220,15 @@ function updateView() {
     `).join('');
 }
 
-function save(id, exerciseName) {
+function save(id, exerciseName, day) {
     const val = document.getElementById('in-' + id).value;
     if(!val) return;
 
-    // 1. Lagre lokalt (for kjapp oversikt i appen)
     const dateShort = new Date().toLocaleDateString('no-NO', {day:'2-digit', month:'2-digit'});
     let localHistory = JSON.parse(localStorage.getItem('nsf_final_' + id)) || [];
     localHistory.unshift({ weight: val, date: dateShort });
     localStorage.setItem('nsf_final_' + id, JSON.stringify(localHistory.slice(0, 5)));
 
-    // 2. Send til Google Sheets via din Web App URL
     fetch(SCRIPT_URL, {
         method: 'POST',
         mode: 'no-cors',
@@ -220,6 +239,8 @@ function save(id, exerciseName) {
     }).then(() => showStatus());
 
     document.getElementById('in-' + id).value = '';
+    // Forfrisk visningen for å tømme feltet, men behold dagen
+    updateView(day);
 }
 
 function showStatus() {
@@ -245,7 +266,9 @@ function toggleHistory(id) {
     }
 }
 
-updateView();
+// Sjekk minnet ved oppstart for å åpne sist brukte dag
+const lastSavedDay = localStorage.getItem('thomas_last_day') || '1';
+updateView(lastSavedDay);
 </script>
 </body>
 </html>
