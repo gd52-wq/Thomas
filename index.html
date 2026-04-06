@@ -3,159 +3,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thomas' treningslogg 💪💪 🐾</title>
+    <title>Thomas' treningslogg Pro 💪🐾</title>
+    <script src="https://www.gstatic.com/charts/loader.js"></script>
     <style>
         :root { 
             --primary: #c0392b; 
             --secondary: #2c3e50; 
-            --card: rgba(255, 255, 255, 0.92); 
+            --card: rgba(255, 255, 255, 0.95); 
+            --success: #27ae60;
+            --gold: #f1c40f;
         }
         
         body { 
             font-family: -apple-system, system-ui, sans-serif; 
-            margin: 0; 
-            padding: 10px;
-            min-height: 100vh;
+            margin: 0; padding: 10px; min-height: 100vh;
             background: url('bedlington.jpg') no-repeat center center fixed; 
             background-size: cover;
             color: #333;
         }
 
         .header { 
-            text-align: center; 
-            padding: 15px 0; 
-            background: rgba(44, 62, 80, 0.85); 
-            color: white; 
-            border-radius: 8px; 
-            margin-bottom: 20px; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            text-align: center; padding: 15px 0; background: rgba(44, 62, 80, 0.85); 
+            color: white; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
 
         .container { max-width: 500px; margin: auto; }
 
-        .day-selector { 
-            display: flex; 
-            justify-content: center; 
-            gap: 15px; 
-            margin-bottom: 20px; 
-        }
+        .mood-box { background: var(--card); padding: 12px; border-radius: 12px; margin-bottom: 15px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .mood-options { display: flex; justify-content: space-around; margin-top: 8px; }
+        .mood-btn { font-size: 1.8em; cursor: pointer; border: 2px solid transparent; border-radius: 10px; padding: 5px; background: none; transition: 0.2s; }
+        .mood-btn.active { border-color: var(--primary); background: rgba(192, 57, 43, 0.1); transform: scale(1.1); }
 
+        .day-selector { display: flex; justify-content: center; gap: 15px; margin-bottom: 15px; }
         .btn-day { 
-            width: 60px; 
-            height: 60px; 
-            border-radius: 50%; 
-            border: none; 
-            background: white; 
-            color: var(--secondary); 
-            font-weight: bold; 
-            font-size: 1.2em; 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2); 
-            cursor: pointer;
-            transition: 0.2s;
+            width: 60px; height: 60px; border-radius: 50%; border: none; background: white; 
+            color: var(--secondary); font-weight: bold; font-size: 1.2em; box-shadow: 0 4px 6px rgba(0,0,0,0.2); cursor: pointer;
         }
-
-        .btn-day.active { 
-            background: var(--primary); 
-            color: white; 
-            transform: scale(1.1);
-        }
+        .btn-day.active { background: var(--primary); color: white; transform: scale(1.1); }
 
         .card { 
-            background: var(--card); 
-            border-radius: 12px; 
-            padding: 15px; 
-            margin-bottom: 15px; 
-            box-shadow: 0 8px 16px rgba(0,0,0,0.2); 
-            border-left: 5px solid var(--primary); 
+            background: var(--card); border-radius: 15px; padding: 15px; margin-bottom: 15px; 
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2); border-left: 6px solid var(--primary); position: relative;
         }
+
+        .pers-badge { position: absolute; top: 10px; right: 10px; color: var(--gold); font-weight: bold; font-size: 0.8em; display: none; align-items: center; gap: 4px; animation: bounce 0.5s ease; }
+        @keyframes bounce { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.3); } }
+
+        /* Sett-prikker stil */
+        .set-tracker { display: flex; gap: 8px; margin: 10px 0; align-items: center; flex-wrap: wrap; }
+        .set-dot { 
+            width: 28px; height: 28px; border: 2px solid #bdc3c7; border-radius: 50%; 
+            cursor: pointer; display: flex; align-items: center; justify-content: center; 
+            font-size: 0.8em; color: #7f8c8d; font-weight: bold; background: white;
+            transition: 0.2s;
+        }
+        .set-dot.done { background: var(--success); border-color: var(--success); color: white; transform: scale(1.1); }
 
         .ex-title { font-weight: bold; color: var(--secondary); font-size: 1.1em; display: block; margin-bottom: 5px; }
         .ex-info { font-size: 0.9em; color: #444; margin-bottom: 5px; font-weight: 600; }
-        .ex-desc { font-size: 0.85em; color: #666; margin-bottom: 10px; line-height: 1.3; font-style: italic; }
+        
+        .input-row { display: flex; gap: 8px; margin-top: 10px; }
+        input { flex: 1; padding: 12px; border: 2px solid #eee; border-radius: 8px; font-size: 16px; outline: none; }
+        
+        .btn-save { padding: 12px 15px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
 
-        .input-row { display: flex; gap: 10px; margin-top: 10px; }
-        input { 
-            flex: 1; 
-            padding: 12px; 
-            border: 1px solid #ccc; 
-            border-radius: 5px; 
-            font-size: 16px; 
-        }
+        .footer-btns { display: flex; align-items: center; gap: 10px; margin-top: 12px; border-top: 1px solid #eee; padding-top: 10px; }
+        .btn-small { background: #95a5a6; font-size: 0.75em; padding: 6px 12px; border: none; color: white; border-radius: 6px; cursor: pointer; }
+        .last-date { font-size: 0.75em; color: #7f8c8d; font-weight: bold; }
 
-        .btn-save { 
-            padding: 10px 15px; 
-            background: var(--primary); 
-            color: white; 
-            border: none; 
-            border-radius: 5px; 
-            font-weight: bold; 
-            cursor: pointer;
-        }
-
-        .footer-btns { 
-            display: flex; 
-            align-items: center;
-            gap: 10px; 
-            margin-top: 10px; 
-            border-top: 1px solid #eee; 
-            padding-top: 10px; 
-        }
-
-        .btn-small { 
-            background: #95a5a6; 
-            font-size: 0.75em; 
-            padding: 5px 10px; 
-            border: none; 
-            color: white; 
-            border-radius: 4px; 
-            cursor: pointer;
-        }
-
-        .last-date {
-            font-size: 0.75em;
-            color: #7f8c8d;
-            font-weight: bold;
-        }
-
-        .history-area { 
-            margin-top: 10px; 
-            padding: 10px; 
-            background: #fdfdfd; 
-            border-radius: 5px; 
-            display: none; 
-            border: 1px solid #ddd; 
-        }
-
-        .history-item { 
-            font-size: 0.8em; 
-            display: flex; 
-            justify-content: space-between; 
-            border-bottom: 1px solid #eee; 
-            padding: 4px 0; 
-        }
+        .history-area { margin-top: 10px; padding: 10px; background: #f9f9f9; border-radius: 8px; display: none; border: 1px solid #ddd; }
+        .chart-div { width: 100%; height: 150px; margin-bottom: 10px; }
+        .history-item { font-size: 0.8em; display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding: 5px 0; }
 
         .status-msg {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #27ae60;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 20px;
-            display: none;
-            z-index: 1000;
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            background: #27ae60; color: white; padding: 10px 20px; border-radius: 20px; display: none; z-index: 1000;
         }
     </style>
 </head>
 <body>
 
-<div id="status" class="status-msg">Lagret i Google Sheets!</div>
+<div id="status" class="status-msg">🚀 Lagret til Sheets og lokalt!</div>
 
 <div class="container">
     <div class="header">
-        <h2 style="margin:0">Thomas' treningslogg 💪💪 🐾</h2>
-        <p style="margin:5px 0 0 0">🐾🐾🐾🐾🐾🐾🐾🐾</p>
+        <h2 style="margin:0">Thomas' treningslogg Pro</h2>
+        <p style="margin:5px 0 0 0">Full kontroll på settene! 💪🐾</p>
+    </div>
+
+    <div class="mood-box">
+        <div style="font-weight: bold; color: var(--secondary); font-size: 0.9em;">Dagens form?</div>
+        <div class="mood-options">
+            <button class="mood-btn" onclick="setMood('⚡')">⚡</button>
+            <button class="mood-btn" onclick="setMood('💪')">💪</button>
+            <button class="mood-btn" onclick="setMood('😴')">😴</button>
+            <button class="mood-btn" onclick="setMood('🤕')">🤕</button>
+        </div>
     </div>
 
     <div class="day-selector">
@@ -168,61 +111,99 @@
 </div>
 
 <script>
+google.charts.load('current', {'packages':['corechart']});
+
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby4uPV4nt98q4WdNB35VVkwJPqaiX5kXLQK5VMK3ZNsQ9jlSTSXg_0-S9H1jiqRiOFJ1w/exec'; 
+let currentMood = "";
 
 const program = {
     "1": [
-        { id: "m1", t: "Magen", i: "3x30", d: "Valgfri (Situps/Benhev)." },
-        { id: "m2", t: "Rygghev", i: "3x12-15", d: "Hold vektskive inntil brystet." },
-        { id: "m3", t: "Styrkeløftknebøy", i: "1x7, 1x6, 1x5, 2x4, 2x3", d: "Vanlig bøy, finn god rytme." },
-        { id: "m4", t: "Benkpress m/stopp", i: "2x6, 2x5, 2x3", d: "1 sek markert stopp på brystet." },
-        { id: "m5", t: "Stiffleg Markløft", i: "2x8, 2x6", d: "Nesten strake bein, kjenn strekk i lår." },
-        { id: "m6", t: "Frontpress", i: "1x6, 2x5, 2x4", d: "Stående skulderpress fra brystet." }
+        { id: "tm1", t: "Magen", i: "3x30", d: "Valgfri (Situps/Benhev)." },
+        { id: "tm2", t: "Rygghev", i: "3x12-15", d: "Hold vektskive inntil brystet." },
+        { id: "tm3", t: "Styrkeløftknebøy", i: "1x7, 1x6, 1x5, 2x4, 2x3", d: "Vanlig bøy." },
+        { id: "tm4", t: "Benkpress m/stopp", i: "2x6, 2x5, 2x3", d: "1 sek stopp." },
+        { id: "tm5", t: "Stiffleg Markløft", i: "2x8, 2x6", d: "Nesten strake bein." },
+        { id: "tm6", t: "Frontpress", i: "1x6, 2x5, 2x4", d: "Stående skulderpress." }
     ],
     "2": [
-        { id: "o1", t: "Magen", i: "3x20", d: "Kontrollert utførelse." },
-        { id: "o2", t: "Rygghev", i: "3x10-12", d: "Litt tyngre enn mandag." },
-        { id: "o3", t: "Knebøy nakke m/stopp", i: "2x6, 2x5, 2x3", d: "Stangen høyt, stopp 1 sek i bunn." },
-        { id: "o4", t: "Benkpress m/stopp", i: "1x8, 2x6, 2x5, 2x4", d: "Husk stopp på hver rep." },
-        { id: "o5", t: "Markløft", i: "6x5", d: "Vanlig mark fra gulv." }
+        { id: "to1", t: "Magen", i: "3x20", d: "Kontrollert." },
+        { id: "to2", t: "Rygghev", i: "3x10-12", d: "Litt tyngre." },
+        { id: "to3", t: "Knebøy nakke m/stopp", i: "2x6, 2x5, 2x3", d: "Stopp 1 sek i bunn." },
+        { id: "to4", t: "Benkpress m/stopp", i: "1x8, 2x6, 2x5, 2x4", d: "Husk stopp." },
+        { id: "to5", t: "Markløft", i: "6x5", d: "Vanlig mark fra gulv." }
     ],
     "3": [
-        { id: "f1", t: "Magen", i: "3x25", d: "God kontakt med kjerne." },
-        { id: "f2", t: "Rygghev", i: "3x8-10", d: "Ukens tyngste rygghev." },
-        { id: "f3", t: "Knebøy nakke", i: "2x5, 4x4, 2x3", d: "Stanga høyt på nakken." },
-        { id: "f4", t: "Smal benkpress", i: "1x6, 2x5, 3x4", d: "Hendene i skulderbredde." },
-        { id: "f5", t: "Mark fra kloss", i: "3x5, 3x4", d: "Stang starter 5-10cm over gulv." },
-        { id: "f6", t: "Nakkepress", i: "5x4-6", d: "Fra nakken og rett opp." }
+        { id: "tf1", t: "Magen", i: "3x25", d: "Kjernefokus." },
+        { id: "tf2", t: "Rygghev", i: "3x8-10", d: "Ukens tyngste." },
+        { id: "tf3", t: "Knebøy nakke", i: "2x5, 4x4, 2x3", d: "Stanga høyt." },
+        { id: "tf4", t: "Smal benkpress", i: "1x6, 2x5, 3x4", d: "Skulderbredde." },
+        { id: "tf5", t: "Mark fra kloss", i: "3x5, 3x4", d: "5-10cm over gulv." },
+        { id: "tf6", t: "Nakkepress", i: "5x4-6", d: "Fra nakken." }
     ]
 };
 
+// Funksjon som finner antall sett basert på teksten i "i" (f.eks "2x6, 2x5, 2x3" blir 6 sett)
+function getSetCount(infoString) {
+    let totalSets = 0;
+    const parts = infoString.split(',');
+    parts.forEach(part => {
+        const match = part.match(/(\d+)x/);
+        if (match) {
+            totalSets += parseInt(match[1]);
+        }
+    });
+    return totalSets || 3; // Standard 3 hvis den ikke finner noe
+}
+
+function setMood(emoji) {
+    currentMood = emoji;
+    document.querySelectorAll('.mood-btn').forEach(b => {
+        b.classList.toggle('active', b.innerText === emoji);
+    });
+}
+
+function toggleSet(btn) {
+    btn.classList.toggle('done');
+}
+
 function updateView(day) {
     localStorage.setItem('thomas_last_day', day);
-    
     document.querySelectorAll('.btn-day').forEach(b => b.classList.remove('active'));
     document.getElementById('btn-' + day).classList.add('active');
 
     const container = document.getElementById('workoutContent');
-    
     container.innerHTML = program[day].map(ex => {
-        // Hent siste dato fra lokal historikk
         const hist = JSON.parse(localStorage.getItem('nsf_final_' + ex.id)) || [];
+        const lastWeight = hist.length > 0 ? hist[0].weight : "";
         const lastDate = hist.length > 0 ? hist[0].date : "Ingen logg";
+        
+        // Finn antall sett for denne øvelsen
+        const numSets = getSetCount(ex.i);
+        let setDotsHtml = "";
+        for(let i = 1; i <= numSets; i++) {
+            setDotsHtml += `<div class="set-dot" onclick="toggleSet(this)">${i}</div>`;
+        }
 
         return `
-        <div class="card">
+        <div class="card" id="card-${ex.id}">
+            <div id="pers-${ex.id}" class="pers-badge">🌟 NY PERS!</div>
             <span class="ex-title">${ex.t}</span>
             <div class="ex-info">${ex.i}</div>
-            <div class="ex-desc">${ex.d}</div>
+            
+            <div class="set-tracker">
+                ${setDotsHtml}
+            </div>
+
             <div class="input-row">
-                <input type="number" id="in-${ex.id}" placeholder="Vekt i kg" inputmode="decimal">
+                <input type="number" id="in-${ex.id}" placeholder="Sist: ${lastWeight} kg" inputmode="decimal">
                 <button class="btn-save" onclick="save('${ex.id}', '${ex.t}', '${day}')">Lagre</button>
             </div>
             <div class="footer-btns">
-                <button class="btn-small" onclick="toggleHistory('${ex.id}')">Logg (lokal)</button>
-                <span class="last-date">Sist: ${lastDate}</span>
+                <button class="btn-small" onclick="toggleHistory('${ex.id}', '${ex.t}')">Logg & Graf</button>
+                <span class="last-date">${lastDate}</span>
             </div>
             <div class="history-area" id="hist-area-${ex.id}">
+                <div id="chart-${ex.id}" class="chart-div"></div>
                 <div id="hist-list-${ex.id}"></div>
             </div>
         </div>
@@ -232,23 +213,30 @@ function updateView(day) {
 function save(id, exerciseName, day) {
     const val = document.getElementById('in-' + id).value;
     if(!val) return;
-
+    const weightVal = parseFloat(val);
     const dateShort = new Date().toLocaleDateString('no-NO', {day:'2-digit', month:'2-digit'});
+    
     let localHistory = JSON.parse(localStorage.getItem('nsf_final_' + id)) || [];
-    localHistory.unshift({ weight: val, date: dateShort });
-    localStorage.setItem('nsf_final_' + id, JSON.stringify(localHistory.slice(0, 5)));
+    const oldMax = localHistory.length > 0 ? Math.max(...localHistory.map(h => h.weight)) : 0;
+    
+    if (weightVal > oldMax && localHistory.length > 0) {
+        document.getElementById('pers-' + id).style.display = 'flex';
+    }
+
+    localHistory.unshift({ weight: weightVal, date: dateShort, mood: currentMood });
+    localStorage.setItem('nsf_final_' + id, JSON.stringify(localHistory.slice(0, 10)));
 
     fetch(SCRIPT_URL, {
         method: 'POST',
         mode: 'no-cors',
         body: JSON.stringify({
-            exercise: exerciseName,
+            exercise: exerciseName + " " + (currentMood || ""),
             weight: val
         })
     }).then(() => showStatus());
 
     document.getElementById('in-' + id).value = '';
-    updateView(day);
+    setTimeout(() => updateView(day), 1500);
 }
 
 function showStatus() {
@@ -257,20 +245,33 @@ function showStatus() {
     setTimeout(() => s.style.display = 'none', 3000);
 }
 
-function toggleHistory(id) {
+function drawChart(id, title) {
+    const hist = JSON.parse(localStorage.getItem('nsf_final_' + id)) || [];
+    if (hist.length < 2) return;
+    const dataArray = [['Dato', 'Kg']];
+    [...hist].reverse().forEach(h => dataArray.push([h.date, parseFloat(h.weight)]));
+    const data = google.visualization.arrayToDataTable(dataArray);
+    const chart = new google.visualization.LineChart(document.getElementById('chart-' + id));
+    chart.draw(data, {
+        title: title, curveType: 'function', legend: 'none',
+        colors: ['#c0392b'], backgroundColor: 'transparent',
+        chartArea: { width: '85%', height: '70%' }
+    });
+}
+
+function toggleHistory(id, title) {
     const area = document.getElementById('hist-area-' + id);
-    if(area.style.display === 'block') {
-        area.style.display = 'none';
-    } else {
-        area.style.display = 'block';
-        const list = document.getElementById('hist-list-' + id);
+    const isOpen = area.style.display === 'block';
+    area.style.display = isOpen ? 'none' : 'block';
+    if(!isOpen) {
+        setTimeout(() => drawChart(id, title), 100);
         const hist = JSON.parse(localStorage.getItem('nsf_final_' + id)) || [];
-        list.innerHTML = hist.map(h => `
+        document.getElementById('hist-list-' + id).innerHTML = hist.map(h => `
             <div class="history-item">
-                <span>${h.date}</span>
+                <span>${h.date} ${h.mood || ''}</span>
                 <strong>${h.weight} kg</strong>
             </div>
-        `).join('') || '<div style="font-size:0.8em">Ingen logg ennå</div>';
+        `).join('') || 'Ingen logg';
     }
 }
 
