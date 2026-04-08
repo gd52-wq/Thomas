@@ -12,6 +12,7 @@
             --card: rgba(255, 255, 255, 0.95); 
             --success: #27ae60;
             --gold: #f1c40f;
+            --video: #2980b9;
         }
         
         body { 
@@ -49,7 +50,6 @@
         .pers-badge { position: absolute; top: 10px; right: 10px; color: var(--gold); font-weight: bold; font-size: 0.8em; display: none; align-items: center; gap: 4px; animation: bounce 0.5s ease; }
         @keyframes bounce { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.3); } }
 
-        /* Sett-prikker stil */
         .set-tracker { display: flex; gap: 8px; margin: 10px 0; align-items: center; flex-wrap: wrap; }
         .set-dot { 
             width: 28px; height: 28px; border: 2px solid #bdc3c7; border-radius: 50%; 
@@ -61,11 +61,22 @@
 
         .ex-title { font-weight: bold; color: var(--secondary); font-size: 1.1em; display: block; margin-bottom: 5px; }
         .ex-info { font-size: 0.9em; color: #444; margin-bottom: 5px; font-weight: 600; }
-        
+        .ex-desc { font-size: 0.85em; color: #666; margin-bottom: 8px; font-style: italic; }
+
+        .video-btn { 
+            display: inline-flex; align-items: center; gap: 5px; margin-top: 5px; padding: 5px 10px;
+            background: var(--video); color: white; text-decoration: none; border-radius: 5px;
+            font-size: 0.75em; font-weight: bold;
+        }
+
         .input-row { display: flex; gap: 8px; margin-top: 10px; }
         input { flex: 1; padding: 12px; border: 2px solid #eee; border-radius: 8px; font-size: 16px; outline: none; }
         
         .btn-save { padding: 12px 15px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .btn-timer { padding: 12px 10px; background: var(--secondary); color: white; border: none; border-radius: 8px; font-size: 0.8em; font-weight: bold; cursor: pointer; min-width: 85px; }
+        .btn-timer.running { background: #7f8c8d; }
+        .btn-timer.finished { background: var(--success); animation: pulse 1s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
 
         .footer-btns { display: flex; align-items: center; gap: 10px; margin-top: 12px; border-top: 1px solid #eee; padding-top: 10px; }
         .btn-small { background: #95a5a6; font-size: 0.75em; padding: 6px 12px; border: none; color: white; border-radius: 6px; cursor: pointer; }
@@ -83,12 +94,11 @@
 </head>
 <body>
 
-<div id="status" class="status-msg">🚀 Lagret til Sheets og lokalt!</div>
+<div id="status" class="status-msg">🚀 Lagret!</div>
 
 <div class="container">
     <div class="header">
         <h2 style="margin:0">Thomas' treningslogg Pro</h2>
-        <p style="margin:5px 0 0 0">Full kontroll på settene! 💪🐾</p>
     </div>
 
     <div class="mood-box">
@@ -115,55 +125,54 @@ google.charts.load('current', {'packages':['corechart']});
 
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby4uPV4nt98q4WdNB35VVkwJPqaiX5kXLQK5VMK3ZNsQ9jlSTSXg_0-S9H1jiqRiOFJ1w/exec'; 
 let currentMood = "";
+let activeTimers = {};
 
 const program = {
     "1": [
-        { id: "tm1", t: "Magen", i: "3x30", d: "Valgfri (Situps/Benhev)." },
-        { id: "tm2", t: "Rygghev", i: "3x12-15", d: "Hold vektskive inntil brystet." },
-        { id: "tm3", t: "Styrkeløftknebøy", i: "1x7, 1x6, 1x5, 2x4, 2x3", d: "Vanlig bøy." },
-        { id: "tm4", t: "Benkpress m/stopp", i: "2x6, 2x5, 2x3", d: "1 sek stopp." },
-        { id: "tm5", t: "Stiffleg Markløft", i: "2x8, 2x6", d: "Nesten strake bein." },
-        { id: "tm6", t: "Frontpress", i: "1x6, 2x5, 2x4", d: "Stående skulderpress." }
+        { id: "tm1", t: "Magen", i: "3x30", d: "Valgfri (Situps/Benhev).", v: "", timer: false },
+        { id: "tm2", t: "Rygghev", i: "3x12-15", d: "Hold vektskive inntil brystet.", v: "", timer: false },
+        { id: "tm3", t: "Styrkeløftknebøy", i: "1x7, 1x6, 1x5, 2x4, 2x3", d: "Vanlig bøy.", v: "https://www.youtube.com/watch?v=SW_C1A-rejs", timer: true },
+        { id: "tm4", t: "Benkpress m/stopp", i: "2x6, 2x5, 2x3", d: "1 sek stopp.", v: "", timer: true },
+        { id: "tm5", t: "Stiffleg Markløft", i: "2x8, 2x6", d: "Nesten strake bein.", v: "", timer: true },
+        { id: "tm6", t: "Frontpress", i: "1x6, 2x5, 2x4", d: "Stående skulderpress.", v: "", timer: true }
     ],
     "2": [
-        { id: "to1", t: "Magen", i: "3x20", d: "Kontrollert." },
-        { id: "to2", t: "Rygghev", i: "3x10-12", d: "Litt tyngre." },
-        { id: "to3", t: "Knebøy nakke m/stopp", i: "2x6, 2x5, 2x3", d: "Stopp 1 sek i bunn." },
-        { id: "to4", t: "Benkpress m/stopp", i: "1x8, 2x6, 2x5, 2x4", d: "Husk stopp." },
-        { id: "to5", t: "Markløft", i: "6x5", d: "Vanlig mark fra gulv." }
+        { id: "to1", t: "Magen", i: "3x20", d: "Kontrollert.", v: "", timer: false },
+        { id: "to2", t: "Rygghev", i: "3x10-12", d: "Litt tyngre.", v: "", timer: false },
+        { id: "to3", t: "Knebøy nakke m/stopp", i: "2x6, 2x5, 2x3", d: "Stopp 1 sek i bunn.", v: "", timer: true },
+        { id: "to4", t: "Benkpress m/stopp", i: "1x8, 2x6, 2x5, 2x4", d: "Husk stopp.", v: "", timer: true },
+        { id: "to5", t: "Markløft", i: "6x5", d: "Vanlig mark fra gulv.", v: "", timer: true }
     ],
     "3": [
-        { id: "tf1", t: "Magen", i: "3x25", d: "Kjernefokus." },
-        { id: "tf2", t: "Rygghev", i: "3x8-10", d: "Ukens tyngste." },
-        { id: "tf3", t: "Knebøy nakke", i: "2x5, 4x4, 2x3", d: "Stanga høyt." },
-        { id: "tf4", t: "Smal benkpress", i: "1x6, 2x5, 3x4", d: "Skulderbredde." },
-        { id: "tf5", t: "Mark fra kloss", i: "3x5, 3x4", d: "5-10cm over gulv." },
-        { id: "tf6", t: "Nakkepress", i: "5x4-6", d: "Fra nakken." }
+        { id: "tf1", t: "Magen", i: "3x25", d: "Kjernefokus.", v: "", timer: false },
+        { id: "tf2", t: "Rygghev", i: "3x8-10", d: "Ukens tyngste.", v: "", timer: false },
+        { id: "tf3", t: "Knebøy nakke", i: "2x5, 4x4, 2x3", d: "Stanga høyt.", v: "", timer: true },
+        { id: "tf4", t: "Smal benkpress", i: "1x6, 2x5, 3x4", d: "Skulderbredde.", v: "", timer: true },
+        { id: "tf5", t: "Mark fra kloss", i: "3x5, 3x4", d: "5-10cm over gulv.", v: "", timer: true },
+        { id: "tf6", t: "Nakkepress", i: "5x4-6", d: "Fra nakken.", v: "", timer: true }
     ]
 };
 
-// Funksjon som finner antall sett basert på teksten i "i" (f.eks "2x6, 2x5, 2x3" blir 6 sett)
 function getSetCount(infoString) {
     let totalSets = 0;
     const parts = infoString.split(',');
     parts.forEach(part => {
         const match = part.match(/(\d+)x/);
-        if (match) {
-            totalSets += parseInt(match[1]);
-        }
+        if (match) totalSets += parseInt(match[1]);
     });
-    return totalSets || 3; // Standard 3 hvis den ikke finner noe
+    return totalSets || 3;
+}
+
+// NY: Lagrer sirkel-status i minnet
+function toggleSet(exId, setNum, element) {
+    element.classList.toggle('done');
+    const isDone = element.classList.contains('done');
+    localStorage.setItem(`thomas_set_${exId}_${setNum}`, isDone);
 }
 
 function setMood(emoji) {
     currentMood = emoji;
-    document.querySelectorAll('.mood-btn').forEach(b => {
-        b.classList.toggle('active', b.innerText === emoji);
-    });
-}
-
-function toggleSet(btn) {
-    btn.classList.toggle('done');
+    document.querySelectorAll('.mood-btn').forEach(b => b.classList.toggle('active', b.innerText === emoji));
 }
 
 function updateView(day) {
@@ -177,11 +186,11 @@ function updateView(day) {
         const lastWeight = hist.length > 0 ? hist[0].weight : "";
         const lastDate = hist.length > 0 ? hist[0].date : "Ingen logg";
         
-        // Finn antall sett for denne øvelsen
         const numSets = getSetCount(ex.i);
         let setDotsHtml = "";
         for(let i = 1; i <= numSets; i++) {
-            setDotsHtml += `<div class="set-dot" onclick="toggleSet(this)">${i}</div>`;
+            const isDone = localStorage.getItem(`thomas_set_${ex.id}_${i}`) === 'true' ? 'done' : '';
+            setDotsHtml += `<div class="set-dot ${isDone}" onclick="toggleSet('${ex.id}', ${i}, this)">${i}</div>`;
         }
 
         return `
@@ -189,14 +198,17 @@ function updateView(day) {
             <div id="pers-${ex.id}" class="pers-badge">🌟 NY PERS!</div>
             <span class="ex-title">${ex.t}</span>
             <div class="ex-info">${ex.i}</div>
-            
-            <div class="set-tracker">
-                ${setDotsHtml}
+            <div class="ex-desc">
+                ${ex.d}
+                ${ex.v ? `<br><a href="${ex.v}" target="_blank" class="video-btn">Se video 🎥</a>` : ''}
             </div>
+            
+            <div class="set-tracker">${setDotsHtml}</div>
 
             <div class="input-row">
                 <input type="number" id="in-${ex.id}" placeholder="Sist: ${lastWeight} kg" inputmode="decimal">
                 <button class="btn-save" onclick="save('${ex.id}', '${ex.t}', '${day}')">Lagre</button>
+                ${ex.timer ? `<button id="timer-${ex.id}" class="btn-timer" onclick="startTimer('${ex.id}')">Pause 2m</button>` : ''}
             </div>
             <div class="footer-btns">
                 <button class="btn-small" onclick="toggleHistory('${ex.id}', '${ex.t}')">Logg & Graf</button>
@@ -227,16 +239,30 @@ function save(id, exerciseName, day) {
     localStorage.setItem('nsf_final_' + id, JSON.stringify(localHistory.slice(0, 10)));
 
     fetch(SCRIPT_URL, {
-        method: 'POST',
-        mode: 'no-cors',
-        body: JSON.stringify({
-            exercise: exerciseName + " " + (currentMood || ""),
-            weight: val
-        })
+        method: 'POST', mode: 'no-cors',
+        body: JSON.stringify({ exercise: exerciseName + " " + (currentMood || ""), weight: val })
     }).then(() => showStatus());
 
     document.getElementById('in-' + id).value = '';
-    setTimeout(() => updateView(day), 1500);
+    updateView(day);
+}
+
+function startTimer(id) {
+    if (activeTimers[id]) return;
+    const btn = document.getElementById('timer-' + id);
+    let timeLeft = 120;
+    btn.classList.add('running');
+    activeTimers[id] = setInterval(() => {
+        timeLeft--;
+        btn.innerText = `${Math.floor(timeLeft/60)}:${(timeLeft%60).toString().padStart(2,'0')}`;
+        if (timeLeft <= 0) {
+            clearInterval(activeTimers[id]);
+            delete activeTimers[id];
+            btn.innerText = "KLAR!";
+            btn.classList.replace('running', 'finished');
+            if(navigator.vibrate) navigator.vibrate([200, 100, 200]);
+        }
+    }, 1000);
 }
 
 function showStatus() {
@@ -275,8 +301,7 @@ function toggleHistory(id, title) {
     }
 }
 
-const lastSavedDay = localStorage.getItem('thomas_last_day') || '1';
-updateView(lastSavedDay);
+updateView(localStorage.getItem('thomas_last_day') || '1');
 </script>
 </body>
 </html>
