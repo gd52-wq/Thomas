@@ -77,6 +77,12 @@
         .btn-timer.finished { background: var(--success); animation: pulse 1s infinite; }
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
 
+        .btn-reset-day { 
+            background: #7f8c8d; color: white; border: none; padding: 15px; 
+            border-radius: 10px; font-weight: bold; cursor: pointer; width: 100%; 
+            margin: 20px 0 40px 0; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
         .footer-btns { display: flex; align-items: center; gap: 10px; margin-top: 12px; border-top: 1px solid #eee; padding-top: 10px; }
         .btn-small { background: #95a5a6; font-size: 0.75em; padding: 6px 12px; border: none; color: white; border-radius: 6px; cursor: pointer; }
         .last-date { font-size: 0.75em; color: #7f8c8d; font-weight: bold; }
@@ -130,8 +136,8 @@ const program = {
     "1": [
         { id: "tm1", t: "Magen", i: "3x30", d: "Valgfri (Situps/Benhev).", v: "", timer: false },
         { id: "tm2", t: "Rygghev", i: "3x12-15", d: "Hold vektskive inntil brystet.", v: "", timer: false },
-        { id: "tm3", t: "Styrkeløftknebøy", i: "1x7, 1x6, 1x5, 2x4, 2x3", d: "Bruk bandasje. Kontrollert snu.", v: "https://www.youtube.com/watch?v=SW_C1A-rejs", timer: true },
-        { id: "tm4", t: "Benkpress m/stopp", i: "2x6, 2x5, 2x3", d: "1 sek stopp.", v: "", timer: true },
+        { id: "tm3", t: "Styrkeløftknebøy (TUNG)", i: "1x7, 1x6, 1x5, 2x4, 2x3", d: "Stopp 5-8 cm over parallell. Bruk bandasje.", v: "https://www.youtube.com/watch?v=SW_C1A-rejs", timer: true },
+        { id: "tm4", t: "Benkpress m/stopp", i: "2x6, 2x5, 2x3", d: "1 sek stopp på brystet.", v: "", timer: true },
         { id: "tm5", t: "Sittende Lårcurl", i: "3x12", d: "Isolert bakside lår - snilt for kneet.", v: "", timer: false },
         { id: "tm6", t: "Frontpress", i: "1x6, 2x5, 2x4", d: "Stående skulderpress.", v: "", timer: true }
     ],
@@ -140,14 +146,14 @@ const program = {
         { id: "to2", t: "Rygghev", i: "3x10-12", d: "Litt tyngre.", v: "", timer: false },
         { id: "to3", t: "Box Squat / Benk-bøy", i: "3x8", d: "Sett deg bakover på benk. Skåner kneet.", v: "", timer: true },
         { id: "to4", t: "Benkpress m/stopp", i: "1x8, 2x6, 2x5, 2x4", d: "Husk stopp.", v: "", timer: true },
-        { id: "to5", t: "Markløft fra kloss", i: "6x5", d: "Vanlig mark fra kloss. Fokus teknikk!", v: "", timer: true }
+        { id: "to5", t: "Markløft (LETT)", i: "6x5", d: "Teknikkfokus! Ikke la rumpa skyte opp.", v: "", timer: true }
     ],
     "3": [
         { id: "tf1", t: "Magen", i: "3x25", d: "Kjernefokus.", v: "", timer: false },
         { id: "tf2", t: "Rygghev", i: "3x8-10", d: "Ukens tyngste.", v: "", timer: false },
-        { id: "tf3", t: "Knebøy nakke", i: "2x5, 4x4, 2x3", d: "Moderat vekt hvis kneet krangler.", v: "", timer: true },
+        { id: "tf3", t: "Knebøy nakke", i: "2x5, 4x4, 2x3", d: "Halvbøy. Moderat vekt pga kne.", v: "", timer: true },
         { id: "tf4", t: "Smal benkpress", i: "1x6, 2x5, 3x4", d: "Skulderbredde.", v: "", timer: true },
-        { id: "tf5", t: "Mark fra kloss", i: "3x5, 3x4", d: "5-10cm over gulv.", v: "", timer: true },
+        { id: "tf5", t: "Mark fra kloss (TUNG)", i: "3x5, 3x4", d: "Start 5-10cm over gulv. Knevennlig!", v: "", timer: true },
         { id: "tf6", t: "Nakkepress", i: "5x4-6", d: "Fra nakken.", v: "", timer: true }
     ]
 };
@@ -165,7 +171,18 @@ function getSetCount(infoString) {
 function toggleSet(exId, setNum, element) {
     element.classList.toggle('done');
     const isDone = element.classList.contains('done');
-    localStorage.setItem(`thomas_v5_set_${exId}_${setNum}`, isDone);
+    localStorage.setItem(`thomas_v6_set_${exId}_${setNum}`, isDone);
+}
+
+function resetAllSets(day) {
+    if(!confirm(`Vil du nullstille alle sirkler for Dag ${day}?`)) return;
+    program[day].forEach(ex => {
+        const numSets = getSetCount(ex.i);
+        for(let i = 1; i <= numSets; i++) {
+            localStorage.removeItem(`thomas_v6_set_${ex.id}_${i}`);
+        }
+    });
+    updateView(day);
 }
 
 function setMood(emoji) {
@@ -179,7 +196,7 @@ function updateView(day) {
     document.getElementById('btn-' + day).classList.add('active');
 
     const container = document.getElementById('workoutContent');
-    container.innerHTML = program[day].map(ex => {
+    let html = program[day].map(ex => {
         const hist = JSON.parse(localStorage.getItem('nsf_final_' + ex.id)) || [];
         const lastWeight = hist.length > 0 ? hist[0].weight : "";
         const lastDate = hist.length > 0 ? hist[0].date : "Ingen logg";
@@ -187,7 +204,7 @@ function updateView(day) {
         const numSets = getSetCount(ex.i);
         let setDotsHtml = "";
         for(let i = 1; i <= numSets; i++) {
-            const isDone = localStorage.getItem(`thomas_v5_set_${ex.id}_${i}`) === 'true' ? 'done' : '';
+            const isDone = localStorage.getItem(`thomas_v6_set_${ex.id}_${i}`) === 'true' ? 'done' : '';
             setDotsHtml += `<div class="set-dot ${isDone}" onclick="toggleSet('${ex.id}', ${i}, this)">${i}</div>`;
         }
 
@@ -218,6 +235,9 @@ function updateView(day) {
             </div>
         </div>
     `}).join('');
+
+    html += `<button class="btn-reset-day" onclick="resetAllSets('${day}')">🔄 Nullstill alle sett (ny uke)</button>`;
+    container.innerHTML = html;
 }
 
 function save(id, exerciseName, day) {
