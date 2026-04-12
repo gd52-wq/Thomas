@@ -47,8 +47,7 @@
             box-shadow: 0 8px 16px rgba(0,0,0,0.2); border-left: 6px solid var(--primary); position: relative;
         }
 
-        .pers-badge { position: absolute; top: 10px; right: 10px; color: var(--gold); font-weight: bold; font-size: 0.8em; display: none; align-items: center; gap: 4px; animation: bounce 0.5s ease; }
-        @keyframes bounce { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.3); } }
+        .pers-badge { position: absolute; top: 10px; right: 10px; color: var(--gold); font-weight: bold; font-size: 0.8em; display: none; align-items: center; gap: 4px; }
 
         .set-tracker { display: flex; gap: 8px; margin: 10px 0; align-items: center; flex-wrap: wrap; }
         .set-dot { 
@@ -131,22 +130,22 @@ const program = {
     "1": [
         { id: "tm1", t: "Magen", i: "3x30", d: "Valgfri (Situps/Benhev).", v: "", timer: false },
         { id: "tm2", t: "Rygghev", i: "3x12-15", d: "Hold vektskive inntil brystet.", v: "", timer: false },
-        { id: "tm3", t: "Styrkeløftknebøy", i: "1x7, 1x6, 1x5, 2x4, 2x3", d: "Vanlig bøy.", v: "https://www.youtube.com/watch?v=SW_C1A-rejs", timer: true },
+        { id: "tm3", t: "Styrkeløftknebøy (TUNG)", i: "1x7, 1x6, 1x5, 2x4, 2x3", d: "Bruk bandasje. Kontrollert snu.", v: "https://www.youtube.com/watch?v=SW_C1A-rejs", timer: true },
         { id: "tm4", t: "Benkpress m/stopp", i: "2x6, 2x5, 2x3", d: "1 sek stopp.", v: "", timer: true },
-        { id: "tm5", t: "Stiffleg Markløft", i: "2x8, 2x6", d: "Nesten strake bein.", v: "", timer: true },
+        { id: "tm5", t: "Sittende Lårcurl", i: "3x12", d: "Isolert bakside lår - snilt for kneet.", v: "", timer: false },
         { id: "tm6", t: "Frontpress", i: "1x6, 2x5, 2x4", d: "Stående skulderpress.", v: "", timer: true }
     ],
     "2": [
         { id: "to1", t: "Magen", i: "3x20", d: "Kontrollert.", v: "", timer: false },
         { id: "to2", t: "Rygghev", i: "3x10-12", d: "Litt tyngre.", v: "", timer: false },
-        { id: "to3", t: "Knebøy nakke m/stopp", i: "2x6, 2x5, 2x3", d: "Stopp 1 sek i bunn.", v: "", timer: true },
+        { id: "to3", t: "Box Squat / Benk-bøy", i: "3x8", d: "Sett deg bakover på benk. Skåner kneet.", v: "", timer: true },
         { id: "to4", t: "Benkpress m/stopp", i: "1x8, 2x6, 2x5, 2x4", d: "Husk stopp.", v: "", timer: true },
-        { id: "to5", t: "Markløft", i: "6x5", d: "Vanlig mark fra gulv.", v: "", timer: true }
+        { id: "to5", t: "Markløft (TUNG)", i: "6x5", d: "Vanlig mark fra gulv. Fokus dag!", v: "", timer: true }
     ],
     "3": [
         { id: "tf1", t: "Magen", i: "3x25", d: "Kjernefokus.", v: "", timer: false },
         { id: "tf2", t: "Rygghev", i: "3x8-10", d: "Ukens tyngste.", v: "", timer: false },
-        { id: "tf3", t: "Knebøy nakke", i: "2x5, 4x4, 2x3", d: "Stanga høyt.", v: "", timer: true },
+        { id: "tf3", t: "Knebøy nakke", i: "2x5, 4x4, 2x3", d: "Moderat vekt hvis kneet krangler.", v: "", timer: true },
         { id: "tf4", t: "Smal benkpress", i: "1x6, 2x5, 3x4", d: "Skulderbredde.", v: "", timer: true },
         { id: "tf5", t: "Mark fra kloss", i: "3x5, 3x4", d: "5-10cm over gulv.", v: "", timer: true },
         { id: "tf6", t: "Nakkepress", i: "5x4-6", d: "Fra nakken.", v: "", timer: true }
@@ -163,11 +162,10 @@ function getSetCount(infoString) {
     return totalSets || 3;
 }
 
-// NY: Lagrer sirkel-status i minnet
 function toggleSet(exId, setNum, element) {
     element.classList.toggle('done');
     const isDone = element.classList.contains('done');
-    localStorage.setItem(`thomas_set_${exId}_${setNum}`, isDone);
+    localStorage.setItem(`thomas_v5_set_${exId}_${setNum}`, isDone);
 }
 
 function setMood(emoji) {
@@ -189,7 +187,7 @@ function updateView(day) {
         const numSets = getSetCount(ex.i);
         let setDotsHtml = "";
         for(let i = 1; i <= numSets; i++) {
-            const isDone = localStorage.getItem(`thomas_set_${ex.id}_${i}`) === 'true' ? 'done' : '';
+            const isDone = localStorage.getItem(`thomas_v5_set_${ex.id}_${i}`) === 'true' ? 'done' : '';
             setDotsHtml += `<div class="set-dot ${isDone}" onclick="toggleSet('${ex.id}', ${i}, this)">${i}</div>`;
         }
 
