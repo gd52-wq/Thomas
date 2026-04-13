@@ -9,10 +9,44 @@
         :root { 
             --primary: #c0392b; 
             --secondary: #2c3e50; 
-            --card: rgba(255, 255, 255, 0.95); 
+            --card: rgba(255, 255, 255, 0.95);
+            --card-solid: #ffffff;
             --success: #27ae60;
             --gold: #f1c40f;
             --video: #2980b9;
+            --text: #333;
+            --text-muted: #666;
+            --text-info: #444;
+            --border: #eee;
+            --dot-border: #bdc3c7;
+            --dot-bg: white;
+            --dot-text: #7f8c8d;
+            --history-bg: #f9f9f9;
+            --history-border: #ddd;
+            --dur-bg: #ecf0f1;
+            --week-bg: rgba(255,255,255,0.93);
+            --note-bg: #f7f9fc;
+            --note-border: #d0d7e2;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --card: rgba(30, 36, 48, 0.97);
+                --card-solid: #1e2430;
+                --text: #e8eaf0;
+                --text-muted: #a0a8b8;
+                --text-info: #c0c8d8;
+                --border: #2e3848;
+                --dot-border: #4a5568;
+                --dot-bg: #252d3d;
+                --dot-text: #8899aa;
+                --history-bg: #1a2030;
+                --history-border: #2e3848;
+                --dur-bg: #252d3d;
+                --week-bg: rgba(20, 26, 38, 0.97);
+                --note-bg: #1a2030;
+                --note-border: #2e3848;
+            }
         }
         
         body { 
@@ -20,7 +54,7 @@
             margin: 0; padding: 10px; min-height: 100vh;
             background: url('bedlington.jpg') no-repeat center center fixed; 
             background-size: cover;
-            color: #333;
+            color: var(--text);
         }
 
         .header { 
@@ -37,10 +71,14 @@
 
         .day-selector { display: flex; justify-content: center; gap: 15px; margin-bottom: 15px; }
         .btn-day { 
-            width: 60px; height: 60px; border-radius: 50%; border: none; background: white; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            width: 82px; height: 64px; border-radius: 14px; border: none; background: var(--card-solid); 
             color: var(--secondary); font-weight: bold; font-size: 1.2em; box-shadow: 0 4px 6px rgba(0,0,0,0.2); cursor: pointer;
+            line-height: 1.1;
         }
-        .btn-day.active { background: var(--primary); color: white; transform: scale(1.1); }
+        .btn-day-sub { font-size: 0.42em; font-weight: normal; color: var(--text-muted); margin-top: 2px; }
+        .btn-day.active { background: var(--primary); color: white; transform: scale(1.05); }
+        .btn-day.active .btn-day-sub { color: rgba(255,255,255,0.8); }
 
         .card { 
             background: var(--card); border-radius: 15px; padding: 15px; margin-bottom: 15px; 
@@ -51,16 +89,16 @@
 
         .set-tracker { display: flex; gap: 8px; margin: 10px 0; align-items: center; flex-wrap: wrap; }
         .set-dot { 
-            width: 28px; height: 28px; border: 2px solid #bdc3c7; border-radius: 50%; 
+            width: 28px; height: 28px; border: 2px solid var(--dot-border); border-radius: 50%; 
             cursor: pointer; display: flex; align-items: center; justify-content: center; 
-            font-size: 0.8em; color: #7f8c8d; font-weight: bold; background: white;
+            font-size: 0.8em; color: var(--dot-text); font-weight: bold; background: var(--dot-bg);
             transition: 0.2s;
         }
         .set-dot.done { background: var(--success); border-color: var(--success); color: white; transform: scale(1.1); }
 
         .ex-title { font-weight: bold; color: var(--secondary); font-size: 1.1em; display: block; margin-bottom: 5px; }
-        .ex-info { font-size: 0.9em; color: #444; margin-bottom: 5px; font-weight: 600; }
-        .ex-desc { font-size: 0.85em; color: #666; margin-bottom: 8px; font-style: italic; }
+        .ex-info { font-size: 0.9em; color: var(--text-info); margin-bottom: 5px; font-weight: 600; }
+        .ex-desc { font-size: 0.85em; color: var(--text-muted); margin-bottom: 8px; font-style: italic; }
 
         .video-btn { 
             display: inline-flex; align-items: center; gap: 5px; margin-top: 5px; padding: 5px 10px;
@@ -69,10 +107,14 @@
         }
 
         .input-row { display: flex; gap: 8px; margin-top: 10px; }
-        input { flex: 1; padding: 12px; border: 2px solid #eee; border-radius: 8px; font-size: 16px; outline: none; }
+        input[type=number] { flex: 1; padding: 12px; border: 2px solid var(--border); border-radius: 8px; font-size: 16px; outline: none; background: var(--dot-bg); color: var(--text); }
         
         .btn-save { padding: 12px 15px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        .btn-timer { padding: 12px 10px; background: var(--secondary); color: white; border: none; border-radius: 8px; font-size: 0.8em; font-weight: bold; cursor: pointer; min-width: 85px; }
+        .timer-wrap { display: flex; flex-direction: column; gap: 4px; }
+        .timer-durations { display: flex; gap: 4px; }
+        .btn-dur { padding: 4px 7px; background: var(--dur-bg); color: var(--secondary); border: none; border-radius: 5px; font-size: 0.7em; font-weight: bold; cursor: pointer; transition: 0.15s; }
+        .btn-dur.selected { background: var(--secondary); color: white; }
+        .btn-timer { padding: 8px 10px; background: var(--secondary); color: white; border: none; border-radius: 8px; font-size: 0.8em; font-weight: bold; cursor: pointer; min-width: 85px; }
         .btn-timer.running { background: #7f8c8d; }
         .btn-timer.finished { background: var(--success); animation: pulse 1s infinite; }
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
@@ -83,13 +125,46 @@
             margin: 20px 0 40px 0; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
 
-        .footer-btns { display: flex; align-items: center; gap: 10px; margin-top: 12px; border-top: 1px solid #eee; padding-top: 10px; }
+        .footer-btns { display: flex; align-items: center; gap: 10px; margin-top: 12px; border-top: 1px solid var(--border); padding-top: 10px; }
         .btn-small { background: #95a5a6; font-size: 0.75em; padding: 6px 12px; border: none; color: white; border-radius: 6px; cursor: pointer; }
-        .last-date { font-size: 0.75em; color: #7f8c8d; font-weight: bold; }
+        .last-date { font-size: 0.75em; color: var(--dot-text); font-weight: bold; }
 
-        .history-area { margin-top: 10px; padding: 10px; background: #f9f9f9; border-radius: 8px; display: none; border: 1px solid #ddd; }
+        .history-area { margin-top: 10px; padding: 10px; background: var(--history-bg); border-radius: 8px; display: none; border: 1px solid var(--history-border); }
         .chart-div { width: 100%; height: 150px; margin-bottom: 10px; }
-        .history-item { font-size: 0.8em; display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding: 5px 0; }
+        .history-item { font-size: 0.8em; display: flex; justify-content: space-between; border-bottom: 1px solid var(--border); padding: 5px 0; color: var(--text); }
+
+
+        /* === UKEOVERSIKT === */
+        .week-box {
+            background: var(--week-bg); border-radius: 12px; margin-bottom: 15px;
+            padding: 12px 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            border-left: 6px solid var(--secondary);
+        }
+        .week-title { font-weight: bold; color: var(--secondary); font-size: 0.85em; margin-bottom: 10px; letter-spacing: 0.03em; }
+        .week-stats { display: flex; gap: 8px; }
+        .week-stat { flex: 1; background: var(--history-bg); border-radius: 8px; padding: 8px; text-align: center; border: 1px solid var(--history-border); }
+        .week-stat-val { font-size: 1.5em; font-weight: bold; color: var(--primary); line-height: 1; }
+        .week-stat-lbl { font-size: 0.7em; color: var(--text-muted); margin-top: 3px; }
+        .week-stat-diff { font-size: 0.7em; margin-top: 2px; font-weight: bold; }
+        .diff-up { color: var(--success); }
+        .diff-down { color: var(--primary); }
+        .diff-same { color: var(--text-muted); }
+
+        /* === NOTATER === */
+        .note-box {
+            background: var(--card); border-radius: 12px; margin-bottom: 15px;
+            padding: 12px 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .note-label { font-weight: bold; color: var(--secondary); font-size: 0.85em; margin-bottom: 8px; display: block; }
+        .note-input {
+            width: 100%; box-sizing: border-box; padding: 10px; border-radius: 8px;
+            border: 1.5px solid var(--note-border); background: var(--note-bg);
+            font-size: 0.9em; color: var(--text); font-family: inherit; resize: none;
+            outline: none; line-height: 1.5;
+        }
+        .note-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 6px; }
+        .note-saved { font-size: 0.72em; color: var(--text-muted); }
+        .btn-note-save { font-size: 0.75em; padding: 5px 12px; background: var(--secondary); color: white; border: none; border-radius: 6px; cursor: pointer; }
 
         .status-msg {
             position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
@@ -116,12 +191,16 @@
         </div>
     </div>
 
+
+    <div id="week-box" class="week-box"></div>
+
     <div class="day-selector">
-        <button id="btn-1" class="btn-day" onclick="updateView('1')">1</button>
-        <button id="btn-2" class="btn-day" onclick="updateView('2')">2</button>
-        <button id="btn-3" class="btn-day" onclick="updateView('3')">3</button>
+        <button id="btn-1" class="btn-day" onclick="updateView('1')">1<span class="btn-day-sub">Knebøy</span></button>
+        <button id="btn-2" class="btn-day" onclick="updateView('2')">2<span class="btn-day-sub">Variasjon</span></button>
+        <button id="btn-3" class="btn-day" onclick="updateView('3')">3<span class="btn-day-sub">Markløft</span></button>
     </div>
 
+    <div id="note-area"></div>
     <div id="workoutContent"></div>
 </div>
 
@@ -176,13 +255,45 @@ function toggleSet(exId, setNum, element) {
 
 function resetAllSets(day) {
     if(!confirm(`Vil du nullstille alle sirkler for Dag ${day}?`)) return;
-    program[day].forEach(ex => {
-        const numSets = getSetCount(ex.i);
-        for(let i = 1; i <= numSets; i++) {
-            localStorage.removeItem(`thomas_v6_set_${ex.id}_${i}`);
-        }
-    });
+    doResetAllSets();
     updateView(day);
+}
+
+function doResetAllSets() {
+    ['1','2','3'].forEach(d => {
+        program[d].forEach(ex => {
+            const numSets = getSetCount(ex.i);
+            for(let i = 1; i <= numSets; i++) {
+                localStorage.removeItem(`thomas_v6_set_${ex.id}_${i}`);
+            }
+        });
+    });
+}
+
+function checkWeeklyReset() {
+    const getMonday = (d) => {
+        const date = new Date(d);
+        const day = date.getDay();
+        const diff = (day === 0 ? -6 : 1 - day);
+        date.setDate(date.getDate() + diff);
+        date.setHours(0, 0, 0, 0);
+        return date.toISOString().split('T')[0];
+    };
+    const thisMonday = getMonday(new Date());
+    const lastReset = localStorage.getItem('thomas_last_weekly_reset');
+    if (lastReset !== thisMonday) {
+        doResetAllSets();
+        localStorage.setItem('thomas_last_weekly_reset', thisMonday);
+        if (lastReset) showWeeklyResetBanner();
+    }
+}
+
+function showWeeklyResetBanner() {
+    const banner = document.createElement('div');
+    banner.innerText = '📅 Ny uke — alle sett er nullstilt!';
+    banner.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#2980b9;color:white;padding:10px 20px;border-radius:20px;z-index:1000;font-weight:bold;font-size:0.9em;box-shadow:0 4px 10px rgba(0,0,0,0.2);';
+    document.body.appendChild(banner);
+    setTimeout(() => banner.remove(), 4000);
 }
 
 function setMood(emoji) {
@@ -221,9 +332,17 @@ function updateView(day) {
             <div class="set-tracker">${setDotsHtml}</div>
 
             <div class="input-row">
-                <input type="number" id="in-${ex.id}" placeholder="Sist: ${lastWeight} kg" inputmode="decimal">
+                <input type="number" id="in-${ex.id}" placeholder="Sist: ${lastWeight} kg" inputmode="decimal" value="${lastWeight}">
                 <button class="btn-save" onclick="save('${ex.id}', '${ex.t}', '${day}')">Lagre</button>
-                ${ex.timer ? `<button id="timer-${ex.id}" class="btn-timer" onclick="startTimer('${ex.id}')">Pause 2m</button>` : ''}
+                ${ex.timer ? `
+                <div class="timer-wrap">
+                    <div class="timer-durations">
+                        <button class="btn-dur" onclick="setDur('${ex.id}',90,this)">90s</button>
+                        <button class="btn-dur selected" onclick="setDur('${ex.id}',120,this)">2m</button>
+                        <button class="btn-dur" onclick="setDur('${ex.id}',180,this)">3m</button>
+                    </div>
+                    <button id="timer-${ex.id}" class="btn-timer" onclick="startTimer('${ex.id}')">Start pause</button>
+                </div>` : ''}
             </div>
             <div class="footer-btns">
                 <button class="btn-small" onclick="toggleHistory('${ex.id}', '${ex.t}')">Logg & Graf</button>
@@ -238,6 +357,8 @@ function updateView(day) {
 
     html += `<button class="btn-reset-day" onclick="resetAllSets('${day}')">🔄 Nullstill alle sett (ny uke)</button>`;
     container.innerHTML = html;
+    renderNoteArea(day);
+    renderWeekBox();
 }
 
 function save(id, exerciseName, day) {
@@ -248,10 +369,7 @@ function save(id, exerciseName, day) {
     
     let localHistory = JSON.parse(localStorage.getItem('nsf_final_' + id)) || [];
     const oldMax = localHistory.length > 0 ? Math.max(...localHistory.map(h => h.weight)) : 0;
-    
-    if (weightVal > oldMax && localHistory.length > 0) {
-        document.getElementById('pers-' + id).style.display = 'flex';
-    }
+    const isNewPers = weightVal > oldMax && localHistory.length > 0;
 
     localHistory.unshift({ weight: weightVal, date: dateShort, mood: currentMood });
     localStorage.setItem('nsf_final_' + id, JSON.stringify(localHistory.slice(0, 10)));
@@ -261,26 +379,160 @@ function save(id, exerciseName, day) {
         body: JSON.stringify({ exercise: exerciseName + " " + (currentMood || ""), weight: val })
     }).then(() => showStatus());
 
-    document.getElementById('in-' + id).value = '';
-    updateView(day);
+    refreshCard(id, isNewPers, weightVal, dateShort, day);
+}
+
+function refreshCard(id, isNewPers, newWeight, newDate, day) {
+    const input = document.getElementById('in-' + id);
+    if (input) {
+        input.value = newWeight;
+        input.placeholder = 'Sist: ' + newWeight + ' kg';
+    }
+
+    const persEl = document.getElementById('pers-' + id);
+    if (persEl && isNewPers) persEl.style.display = 'flex';
+
+    const card = document.getElementById('card-' + id);
+    if (card) {
+        const dateEl = card.querySelector('.last-date');
+        if (dateEl) dateEl.textContent = newDate;
+    }
+
+    renderWeekBox();
+}
+
+const timerDurations = {};
+
+function setDur(id, seconds, el) {
+    timerDurations[id] = seconds;
+    el.closest('.timer-durations').querySelectorAll('.btn-dur').forEach(b => b.classList.remove('selected'));
+    el.classList.add('selected');
 }
 
 function startTimer(id) {
-    if (activeTimers[id]) return;
     const btn = document.getElementById('timer-' + id);
-    let timeLeft = 120;
+    if (activeTimers[id]) {
+        clearInterval(activeTimers[id]);
+        delete activeTimers[id];
+        btn.innerText = 'Start pause';
+        btn.className = 'btn-timer';
+        return;
+    }
+    let timeLeft = timerDurations[id] || 120;
     btn.classList.add('running');
+    btn.innerText = `${Math.floor(timeLeft/60)}:${(timeLeft%60).toString().padStart(2,'0')}`;
     activeTimers[id] = setInterval(() => {
         timeLeft--;
         btn.innerText = `${Math.floor(timeLeft/60)}:${(timeLeft%60).toString().padStart(2,'0')}`;
         if (timeLeft <= 0) {
             clearInterval(activeTimers[id]);
             delete activeTimers[id];
-            btn.innerText = "KLAR!";
+            btn.innerText = "KLAR! ✓";
             btn.classList.replace('running', 'finished');
             if(navigator.vibrate) navigator.vibrate([200, 100, 200]);
+            setTimeout(() => {
+                if (btn) { btn.innerText = 'Start pause'; btn.className = 'btn-timer'; }
+            }, 4000);
         }
     }, 1000);
+}
+
+function renderNoteArea(day) {
+    const key = 'thomas_note_day' + day;
+    const notes = JSON.parse(localStorage.getItem(key)) || [];
+    const latest = notes[0] || null;
+    const savedText = latest ? latest.text : '';
+    const savedDate = latest ? latest.date : '';
+    document.getElementById('note-area').innerHTML = `
+        <div class="note-box">
+            <span class="note-label">📝 Notat for dag ${day}</span>
+            <textarea class="note-input" id="note-input-${day}" rows="2" placeholder="Hvordan gikk økten? Noe som kjentes tungt eller bra?">${savedText}</textarea>
+            <div class="note-footer">
+                <span class="note-saved">${savedDate ? 'Lagret ' + savedDate : 'Ikke lagret enda'}</span>
+                <button class="btn-note-save" onclick="saveNote('${day}')">Lagre notat</button>
+            </div>
+        </div>`;
+}
+
+function saveNote(day) {
+    const key = 'thomas_note_day' + day;
+    const text = document.getElementById('note-input-' + day).value.trim();
+    if (!text) return;
+    const notes = JSON.parse(localStorage.getItem(key)) || [];
+    const dateShort = new Date().toLocaleDateString('no-NO', {day:'2-digit', month:'2-digit'});
+    notes.unshift({ text, date: dateShort });
+    localStorage.setItem(key, JSON.stringify(notes.slice(0, 10)));
+    renderNoteArea(day);
+}
+
+function renderWeekBox() {
+    const getMonday = (d) => {
+        const date = new Date(d);
+        const diff = (date.getDay() === 0 ? -6 : 1 - date.getDay());
+        date.setDate(date.getDate() + diff);
+        date.setHours(0,0,0,0);
+        return date.toISOString().split('T')[0];
+    };
+    const thisMonday = getMonday(new Date());
+    const lastMonday = (() => {
+        const d = new Date(thisMonday);
+        d.setDate(d.getDate() - 7);
+        return d.toISOString().split('T')[0];
+    })();
+
+    const countSetsForWeek = (monday) => {
+        const end = new Date(monday);
+        end.setDate(end.getDate() + 7);
+        let totalSets = 0, daysActive = new Set();
+        ['1','2','3'].forEach(d => {
+            program[d].forEach(ex => {
+                const hist = JSON.parse(localStorage.getItem('nsf_final_' + ex.id)) || [];
+                hist.forEach(h => {
+                    if (!h.date) return;
+                    const [dd, mm] = h.date.split('.');
+                    const year = new Date().getFullYear();
+                    const entryDate = new Date(year, mm-1, dd);
+                    const start = new Date(monday);
+                    if (entryDate >= start && entryDate < end) {
+                        totalSets++;
+                        daysActive.add(h.date);
+                    }
+                });
+            });
+        });
+        return { sets: totalSets, days: daysActive.size };
+    };
+
+    const thisWeek = countSetsForWeek(thisMonday);
+    const lastWeek = countSetsForWeek(lastMonday);
+
+    const diffSets = thisWeek.sets - lastWeek.sets;
+    const diffDays = thisWeek.days - lastWeek.days;
+    const fmtDiff = (n, unit) => {
+        if (n > 0) return `<span class="diff-up">▲ ${n} ${unit}</span>`;
+        if (n < 0) return `<span class="diff-down">▼ ${Math.abs(n)} ${unit}</span>`;
+        return `<span class="diff-same">= samme</span>`;
+    };
+
+    document.getElementById('week-box').innerHTML = `
+        <div class="week-title">📅 DENNE UKEN</div>
+        <div class="week-stats">
+            <div class="week-stat">
+                <div class="week-stat-val">${thisWeek.days}</div>
+                <div class="week-stat-lbl">Dager</div>
+                <div class="week-stat-diff">${fmtDiff(diffDays, '')}</div>
+            </div>
+            <div class="week-stat">
+                <div class="week-stat-val">${thisWeek.sets}</div>
+                <div class="week-stat-lbl">Loggede sett</div>
+                <div class="week-stat-diff">${fmtDiff(diffSets, 'sett')}</div>
+            </div>
+            <div class="week-stat">
+                <div class="week-stat-val">${lastWeek.sets}</div>
+                <div class="week-stat-lbl">Forrige uke</div>
+                <div class="week-stat-diff">&nbsp;</div>
+            </div>
+        </div>`;
 }
 
 function showStatus() {
@@ -319,6 +571,7 @@ function toggleHistory(id, title) {
     }
 }
 
+checkWeeklyReset();
 updateView(localStorage.getItem('thomas_last_day') || '1');
 </script>
 </body>
