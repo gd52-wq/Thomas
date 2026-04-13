@@ -2,187 +2,146 @@
 <html lang="no">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Thomas' treningslogg Pro 💪🐾</title>
     <script src="https://www.gstatic.com/charts/loader.js"></script>
     <style>
         :root { 
             --primary: #c0392b; 
             --secondary: #2c3e50; 
-            --card: rgba(255, 255, 255, 0.95);
+            --card: rgba(255, 255, 255, 0.98);
             --card-solid: #ffffff;
             --success: #27ae60;
-            --gold: #f1c40f;
+            --gold: #f39c12;
             --video: #2980b9;
-            --text: #333;
-            --text-muted: #666;
-            --text-info: #444;
-            --border: #eee;
+            --text: #1a1a1a;
+            --text-muted: #555;
+            --text-info: #333;
+            --border: #ddd;
             --dot-border: #bdc3c7;
-            --dot-bg: white;
-            --dot-text: #7f8c8d;
-            --history-bg: #f9f9f9;
-            --history-border: #ddd;
-            --dur-bg: #ecf0f1;
-            --week-bg: rgba(255,255,255,0.93);
-            --note-bg: #f7f9fc;
-            --note-border: #d0d7e2;
+            --dot-bg: #f8f9fa;
+            --dot-text: #555;
+            --history-bg: #f2f2f2;
+            --history-border: #ccc;
+            --week-bg: rgba(255,255,255,0.95);
+            --note-bg: #ffffff;
+            --note-border: #ccc;
         }
 
         @media (prefers-color-scheme: dark) {
             :root {
-                --card: rgba(30, 36, 48, 0.97);
-                --card-solid: #1e2430;
-                --text: #e8eaf0;
-                --text-muted: #a0a8b8;
-                --text-info: #c0c8d8;
-                --border: #2e3848;
-                --dot-border: #4a5568;
-                --dot-bg: #252d3d;
-                --dot-text: #8899aa;
-                --history-bg: #1a2030;
-                --history-border: #2e3848;
-                --dur-bg: #252d3d;
-                --week-bg: rgba(20, 26, 38, 0.97);
-                --note-bg: #1a2030;
-                --note-border: #2e3848;
+                --card: #1c222d;
+                --card-solid: #1c222d;
+                --text: #ffffff;
+                --text-muted: #a0aab8;
+                --text-info: #d1d5db;
+                --border: #374151;
+                --dot-border: #4b5563;
+                --dot-bg: #2d3748;
+                --dot-text: #e5e7eb;
+                --history-bg: #111827;
+                --history-border: #374151;
+                --week-bg: #1c222d;
+                --note-bg: #111827;
+                --note-border: #374151;
+                --secondary: #94a3b8;
             }
+            body { background-blend-mode: multiply; background-color: #111; }
         }
         
         body { 
-            font-family: -apple-system, system-ui, sans-serif; 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
             margin: 0; padding: 10px; min-height: 100vh;
             background: url('bedlington.jpg') no-repeat center center fixed; 
             background-size: cover;
             color: var(--text);
+            line-height: 1.4;
         }
 
         .header { 
-            text-align: center; padding: 15px 0; background: rgba(44, 62, 80, 0.85); 
-            color: white; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            text-align: center; padding: 15px 0; background: rgba(0, 0, 0, 0.75); 
+            color: white; border-radius: 12px; margin-bottom: 15px;
         }
 
         .container { max-width: 500px; margin: auto; }
 
-        .mood-box { background: var(--card); padding: 12px; border-radius: 12px; margin-bottom: 15px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .mood-options { display: flex; justify-content: space-around; margin-top: 8px; }
-        .mood-btn { font-size: 1.8em; cursor: pointer; border: 2px solid transparent; border-radius: 10px; padding: 5px; background: none; transition: 0.2s; }
-        .mood-btn.active { border-color: var(--primary); background: rgba(192, 57, 43, 0.1); transform: scale(1.1); }
+        .mood-box { background: var(--card); padding: 15px; border-radius: 12px; margin-bottom: 15px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        .mood-options { display: flex; justify-content: space-around; margin-top: 10px; }
+        .mood-btn { font-size: 2em; cursor: pointer; border: 2px solid transparent; border-radius: 12px; padding: 8px; background: var(--dot-bg); transition: 0.2s; }
+        .mood-btn.active { border-color: var(--primary); background: rgba(192, 57, 43, 0.2); transform: scale(1.1); }
 
-        .day-selector { display: flex; justify-content: center; gap: 15px; margin-bottom: 15px; }
+        .day-selector { display: flex; justify-content: space-between; gap: 8px; margin-bottom: 15px; }
         .btn-day { 
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            width: 82px; height: 64px; border-radius: 14px; border: none; background: var(--card-solid); 
-            color: var(--secondary); font-weight: bold; font-size: 1.2em; box-shadow: 0 4px 6px rgba(0,0,0,0.2); cursor: pointer;
-            line-height: 1.1;
+            flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            height: 70px; border-radius: 12px; border: none; background: var(--card-solid); 
+            color: var(--text); font-weight: bold; font-size: 1.1em; box-shadow: 0 4px 6px rgba(0,0,0,0.2); cursor: pointer;
         }
-        .btn-day-sub { font-size: 0.42em; font-weight: normal; color: var(--text-muted); margin-top: 2px; }
-        .btn-day.active { background: var(--primary); color: white; transform: scale(1.05); }
-        .btn-day.active .btn-day-sub { color: rgba(255,255,255,0.8); }
+        .btn-day-sub { font-size: 0.5em; font-weight: normal; color: var(--text-muted); margin-top: 4px; }
+        .btn-day.active { background: var(--primary); color: white; }
+        .btn-day.active .btn-day-sub { color: rgba(255,255,255,0.9); }
 
         .card { 
-            background: var(--card); border-radius: 15px; padding: 15px; margin-bottom: 15px; 
-            box-shadow: 0 8px 16px rgba(0,0,0,0.2); border-left: 6px solid var(--primary); position: relative;
+            background: var(--card); border-radius: 15px; padding: 18px; margin-bottom: 15px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15); border-left: 6px solid var(--primary); position: relative;
         }
 
-        .pers-badge { position: absolute; top: 10px; right: 10px; color: var(--gold); font-weight: bold; font-size: 0.8em; display: none; align-items: center; gap: 4px; }
+        .pers-badge { position: absolute; top: 12px; right: 12px; color: var(--gold); font-weight: bold; font-size: 0.8em; display: none; align-items: center; gap: 4px; }
 
-        .set-tracker { display: flex; gap: 8px; margin: 10px 0; align-items: center; flex-wrap: wrap; }
+        .set-tracker { display: flex; gap: 10px; margin: 15px 0; align-items: center; flex-wrap: wrap; }
         .set-dot { 
-            width: 28px; height: 28px; border: 2px solid var(--dot-border); border-radius: 50%; 
+            width: 34px; height: 34px; border: 2px solid var(--dot-border); border-radius: 50%; 
             cursor: pointer; display: flex; align-items: center; justify-content: center; 
-            font-size: 0.8em; color: var(--dot-text); font-weight: bold; background: var(--dot-bg);
-            transition: 0.2s;
+            font-size: 0.9em; color: var(--dot-text); font-weight: bold; background: var(--dot-bg);
         }
-        .set-dot.done { background: var(--success); border-color: var(--success); color: white; transform: scale(1.1); }
+        .set-dot.done { background: var(--success); border-color: var(--success); color: white; }
 
-        .ex-title { font-weight: bold; color: var(--secondary); font-size: 1.1em; display: block; margin-bottom: 5px; }
-        .ex-info { font-size: 0.9em; color: var(--text-info); margin-bottom: 5px; font-weight: 600; }
-        .ex-desc { font-size: 0.85em; color: var(--text-muted); margin-bottom: 8px; font-style: italic; }
+        .ex-title { font-weight: 800; color: var(--text); font-size: 1.2em; display: block; margin-bottom: 4px; }
+        .ex-info { font-size: 1em; color: var(--primary); margin-bottom: 6px; font-weight: bold; }
+        .ex-desc { font-size: 0.9em; color: var(--text-muted); margin-bottom: 10px; }
 
         .video-btn { 
-            display: inline-flex; align-items: center; gap: 5px; margin-top: 5px; padding: 5px 10px;
-            background: var(--video); color: white; text-decoration: none; border-radius: 5px;
-            font-size: 0.75em; font-weight: bold;
+            display: inline-flex; align-items: center; gap: 5px; margin-top: 8px; padding: 6px 12px;
+            background: var(--video); color: white; text-decoration: none; border-radius: 6px;
+            font-size: 0.8em; font-weight: bold;
         }
 
-        .input-row { display: flex; gap: 8px; margin-top: 10px; }
-        input[type=number] { flex: 1; padding: 12px; border: 2px solid var(--border); border-radius: 8px; font-size: 16px; outline: none; background: var(--dot-bg); color: var(--text); }
+        /* Ny rad-layout for mobil */
+        .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
+        input[type=number] { width: 100%; padding: 12px; border: 2px solid var(--border); border-radius: 10px; font-size: 18px; box-sizing: border-box; background: var(--dot-bg); color: var(--text); }
+        .btn-save { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 10px; font-weight: bold; font-size: 16px; }
         
-        .btn-save { padding: 12px 15px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        .timer-wrap { display: flex; flex-direction: column; gap: 4px; }
-        .timer-durations { display: flex; gap: 4px; }
-        .btn-dur { padding: 4px 7px; background: var(--dur-bg); color: var(--secondary); border: none; border-radius: 5px; font-size: 0.7em; font-weight: bold; cursor: pointer; transition: 0.15s; }
-        .btn-dur.selected { background: var(--secondary); color: white; }
-        .btn-timer { padding: 8px 10px; background: var(--secondary); color: white; border: none; border-radius: 8px; font-size: 0.8em; font-weight: bold; cursor: pointer; min-width: 85px; }
-        .btn-timer.running { background: #7f8c8d; }
-        .btn-timer.finished { background: var(--success); animation: pulse 1s infinite; }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+        .timer-container { grid-column: span 2; margin-top: 5px; }
+        .btn-timer { width: 100%; padding: 14px; background: var(--secondary); color: white; border: none; border-radius: 10px; font-size: 1em; font-weight: bold; }
+        .btn-timer.running { background: #e67e22; }
+        .btn-timer.finished { background: var(--success); }
 
-        .btn-reset-day { 
-            background: #7f8c8d; color: white; border: none; padding: 15px; 
-            border-radius: 10px; font-weight: bold; cursor: pointer; width: 100%; 
-            margin: 20px 0 40px 0; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
+        .btn-reset-day { background: #666; color: white; border: none; padding: 18px; border-radius: 12px; font-weight: bold; width: 100%; margin: 20px 0 50px 0; }
 
-        .footer-btns { display: flex; align-items: center; gap: 10px; margin-top: 12px; border-top: 1px solid var(--border); padding-top: 10px; }
-        .btn-small { background: #95a5a6; font-size: 0.75em; padding: 6px 12px; border: none; color: white; border-radius: 6px; cursor: pointer; }
-        .last-date { font-size: 0.75em; color: var(--dot-text); font-weight: bold; }
+        .footer-btns { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; border-top: 1px solid var(--border); padding-top: 12px; }
+        .btn-small { background: transparent; border: 1px solid var(--dot-border); font-size: 0.8em; padding: 8px 12px; color: var(--text-muted); border-radius: 8px; }
+        .last-date { font-size: 0.8em; color: var(--text-muted); }
 
-        .history-area { margin-top: 10px; padding: 10px; background: var(--history-bg); border-radius: 8px; display: none; border: 1px solid var(--history-border); }
-        .chart-div { width: 100%; height: 150px; margin-bottom: 10px; }
-        .history-item { font-size: 0.8em; display: flex; justify-content: space-between; border-bottom: 1px solid var(--border); padding: 5px 0; color: var(--text); }
+        .week-box { background: var(--week-bg); border-radius: 12px; margin-bottom: 15px; padding: 15px; border-left: 6px solid var(--secondary); }
+        .week-stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 10px; }
+        .week-stat { background: var(--history-bg); border-radius: 10px; padding: 10px; text-align: center; }
+        .week-stat-val { font-size: 1.4em; font-weight: 900; color: var(--primary); }
+        .week-stat-lbl { font-size: 0.7em; text-transform: uppercase; color: var(--text-muted); }
 
-
-        /* === UKEOVERSIKT === */
-        .week-box {
-            background: var(--week-bg); border-radius: 12px; margin-bottom: 15px;
-            padding: 12px 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-            border-left: 6px solid var(--secondary);
-        }
-        .week-title { font-weight: bold; color: var(--secondary); font-size: 0.85em; margin-bottom: 10px; letter-spacing: 0.03em; }
-        .week-stats { display: flex; gap: 8px; }
-        .week-stat { flex: 1; background: var(--history-bg); border-radius: 8px; padding: 8px; text-align: center; border: 1px solid var(--history-border); }
-        .week-stat-val { font-size: 1.5em; font-weight: bold; color: var(--primary); line-height: 1; }
-        .week-stat-lbl { font-size: 0.7em; color: var(--text-muted); margin-top: 3px; }
-        .week-stat-diff { font-size: 0.7em; margin-top: 2px; font-weight: bold; }
-        .diff-up { color: var(--success); }
-        .diff-down { color: var(--primary); }
-        .diff-same { color: var(--text-muted); }
-
-        /* === NOTATER === */
-        .note-box {
-            background: var(--card); border-radius: 12px; margin-bottom: 15px;
-            padding: 12px 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-        .note-label { font-weight: bold; color: var(--secondary); font-size: 0.85em; margin-bottom: 8px; display: block; }
-        .note-input {
-            width: 100%; box-sizing: border-box; padding: 10px; border-radius: 8px;
-            border: 1.5px solid var(--note-border); background: var(--note-bg);
-            font-size: 0.9em; color: var(--text); font-family: inherit; resize: none;
-            outline: none; line-height: 1.5;
-        }
-        .note-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 6px; }
-        .note-saved { font-size: 0.72em; color: var(--text-muted); }
-        .btn-note-save { font-size: 0.75em; padding: 5px 12px; background: var(--secondary); color: white; border: none; border-radius: 6px; cursor: pointer; }
-
-        .status-msg {
-            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-            background: #27ae60; color: white; padding: 10px 20px; border-radius: 20px; display: none; z-index: 1000;
-        }
+        .note-input { width: 100%; box-sizing: border-box; padding: 12px; border-radius: 10px; border: 2px solid var(--note-border); background: var(--note-bg); color: var(--text); font-size: 16px; margin-top: 10px; }
+        .status-msg { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--success); color: white; padding: 12px 30px; border-radius: 30px; font-weight: bold; z-index: 2000; box-shadow: 0 5px 15px rgba(0,0,0,0.3); display: none; }
     </style>
 </head>
 <body>
 
-<div id="status" class="status-msg">🚀 Lagret!</div>
+<div id="status" class="status-msg">✅ Lagret!</div>
 
 <div class="container">
     <div class="header">
-        <h2 style="margin:0">Thomas' treningslogg Pro</h2>
+        <h2 style="margin:0">Thomas' treningslogg</h2>
     </div>
 
     <div class="mood-box">
-        <div style="font-weight: bold; color: var(--secondary); font-size: 0.9em;">Dagens form?</div>
+        <div style="font-weight: bold; color: var(--text-muted); font-size: 0.9em;">Dagens dagsform?</div>
         <div class="mood-options">
             <button class="mood-btn" onclick="setMood('⚡')">⚡</button>
             <button class="mood-btn" onclick="setMood('💪')">💪</button>
@@ -191,13 +150,12 @@
         </div>
     </div>
 
-
     <div id="week-box" class="week-box"></div>
 
     <div class="day-selector">
-        <button id="btn-1" class="btn-day" onclick="updateView('1')">1<span class="btn-day-sub">Knebøy</span></button>
-        <button id="btn-2" class="btn-day" onclick="updateView('2')">2<span class="btn-day-sub">Variasjon</span></button>
-        <button id="btn-3" class="btn-day" onclick="updateView('3')">3<span class="btn-day-sub">Markløft</span></button>
+        <button id="btn-1" class="btn-day" onclick="updateView('1')">DAG 1<span class="btn-day-sub">Knebøy</span></button>
+        <button id="btn-2" class="btn-day" onclick="updateView('2')">DAG 2<span class="btn-day-sub">Variasjon</span></button>
+        <button id="btn-3" class="btn-day" onclick="updateView('3')">DAG 3<span class="btn-day-sub">Markløft</span></button>
     </div>
 
     <div id="note-area"></div>
@@ -239,8 +197,7 @@ const program = {
 
 function getSetCount(infoString) {
     let totalSets = 0;
-    const parts = infoString.split(',');
-    parts.forEach(part => {
+    infoString.split(',').forEach(part => {
         const match = part.match(/(\d+)x/);
         if (match) totalSets += parseInt(match[1]);
     });
@@ -249,74 +206,23 @@ function getSetCount(infoString) {
 
 function toggleSet(exId, setNum, element) {
     element.classList.toggle('done');
-    const isDone = element.classList.contains('done');
-    localStorage.setItem(`thomas_v6_set_${exId}_${setNum}`, isDone);
-}
-
-function resetAllSets(day) {
-    if(!confirm(`Vil du nullstille alle sirkler for Dag ${day}?`)) return;
-    doResetAllSets();
-    updateView(day);
-}
-
-function doResetAllSets() {
-    ['1','2','3'].forEach(d => {
-        program[d].forEach(ex => {
-            const numSets = getSetCount(ex.i);
-            for(let i = 1; i <= numSets; i++) {
-                localStorage.removeItem(`thomas_v6_set_${ex.id}_${i}`);
-            }
-        });
-    });
-}
-
-function checkWeeklyReset() {
-    const getMonday = (d) => {
-        const date = new Date(d);
-        const day = date.getDay();
-        const diff = (day === 0 ? -6 : 1 - day);
-        date.setDate(date.getDate() + diff);
-        date.setHours(0, 0, 0, 0);
-        return date.toISOString().split('T')[0];
-    };
-    const thisMonday = getMonday(new Date());
-    const lastReset = localStorage.getItem('thomas_last_weekly_reset');
-    if (lastReset !== thisMonday) {
-        doResetAllSets();
-        localStorage.setItem('thomas_last_weekly_reset', thisMonday);
-        if (lastReset) showWeeklyResetBanner();
-    }
-}
-
-function showWeeklyResetBanner() {
-    const banner = document.createElement('div');
-    banner.innerText = '📅 Ny uke — alle sett er nullstilt!';
-    banner.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#2980b9;color:white;padding:10px 20px;border-radius:20px;z-index:1000;font-weight:bold;font-size:0.9em;box-shadow:0 4px 10px rgba(0,0,0,0.2);';
-    document.body.appendChild(banner);
-    setTimeout(() => banner.remove(), 4000);
-}
-
-function setMood(emoji) {
-    currentMood = emoji;
-    document.querySelectorAll('.mood-btn').forEach(b => b.classList.toggle('active', b.innerText === emoji));
+    localStorage.setItem(`thomas_v6_set_${exId}_${setNum}`, element.classList.contains('done'));
 }
 
 function updateView(day) {
     localStorage.setItem('thomas_last_day', day);
-    document.querySelectorAll('.btn-day').forEach(b => b.classList.remove('active'));
-    document.getElementById('btn-' + day).classList.add('active');
+    document.querySelectorAll('.btn-day').forEach(b => b.classList.toggle('active', b.id === 'btn-'+day));
 
     const container = document.getElementById('workoutContent');
-    let html = program[day].map(ex => {
+    container.innerHTML = program[day].map(ex => {
         const hist = JSON.parse(localStorage.getItem('nsf_final_' + ex.id)) || [];
         const lastWeight = hist.length > 0 ? hist[0].weight : "";
         const lastDate = hist.length > 0 ? hist[0].date : "Ingen logg";
         
-        const numSets = getSetCount(ex.i);
-        let setDotsHtml = "";
-        for(let i = 1; i <= numSets; i++) {
-            const isDone = localStorage.getItem(`thomas_v6_set_${ex.id}_${i}`) === 'true' ? 'done' : '';
-            setDotsHtml += `<div class="set-dot ${isDone}" onclick="toggleSet('${ex.id}', ${i}, this)">${i}</div>`;
+        let dots = "";
+        for(let i = 1; i <= getSetCount(ex.i); i++) {
+            const done = localStorage.getItem(`thomas_v6_set_${ex.id}_${i}`) === 'true' ? 'done' : '';
+            dots += `<div class="set-dot ${done}" onclick="toggleSet('${ex.id}', ${i}, this)">${i}</div>`;
         }
 
         return `
@@ -324,254 +230,108 @@ function updateView(day) {
             <div id="pers-${ex.id}" class="pers-badge">🌟 NY PERS!</div>
             <span class="ex-title">${ex.t}</span>
             <div class="ex-info">${ex.i}</div>
-            <div class="ex-desc">
-                ${ex.d}
-                ${ex.v ? `<br><a href="${ex.v}" target="_blank" class="video-btn">Se video 🎥</a>` : ''}
-            </div>
+            <div class="ex-desc">${ex.d} ${ex.v ? `<br><a href="${ex.v}" target="_blank" class="video-btn">Video 🎥</a>` : ''}</div>
             
-            <div class="set-tracker">${setDotsHtml}</div>
+            <div class="set-tracker">${dots}</div>
 
             <div class="input-row">
-                <input type="number" id="in-${ex.id}" placeholder="Sist: ${lastWeight} kg" inputmode="decimal" value="${lastWeight}">
+                <input type="number" id="in-${ex.id}" placeholder="${lastWeight || 'Kg'}" inputmode="decimal" value="${lastWeight}">
                 <button class="btn-save" onclick="save('${ex.id}', '${ex.t}', '${day}')">Lagre</button>
-                ${ex.timer ? `
-                <div class="timer-wrap">
-                    <div class="timer-durations">
-                        <button class="btn-dur" onclick="setDur('${ex.id}',90,this)">90s</button>
-                        <button class="btn-dur selected" onclick="setDur('${ex.id}',120,this)">2m</button>
-                        <button class="btn-dur" onclick="setDur('${ex.id}',180,this)">3m</button>
-                    </div>
-                    <button id="timer-${ex.id}" class="btn-timer" onclick="startTimer('${ex.id}')">Start pause</button>
-                </div>` : ''}
+                ${ex.timer ? `<div class="timer-container"><button id="timer-${ex.id}" class="btn-timer" onclick="startTimer('${ex.id}')">Start pause (2m)</button></div>` : ''}
             </div>
             <div class="footer-btns">
-                <button class="btn-small" onclick="toggleHistory('${ex.id}', '${ex.t}')">Logg & Graf</button>
-                <span class="last-date">${lastDate}</span>
+                <button class="btn-small" onclick="toggleHistory('${ex.id}', '${ex.t}')">Historikk</button>
+                <span class="last-date">Sist: ${lastDate}</span>
             </div>
-            <div class="history-area" id="hist-area-${ex.id}">
+            <div class="history-area" id="hist-area-${ex.id}" style="display:none">
                 <div id="chart-${ex.id}" class="chart-div"></div>
                 <div id="hist-list-${ex.id}"></div>
             </div>
-        </div>
-    `}).join('');
-
-    html += `<button class="btn-reset-day" onclick="resetAllSets('${day}')">🔄 Nullstill alle sett (ny uke)</button>`;
-    container.innerHTML = html;
+        </div>`;
+    }).join('') + `<button class="btn-reset-day" onclick="resetAllSets('${day}')">🔄 Nullstill sirkler for ny uke</button>`;
+    
     renderNoteArea(day);
     renderWeekBox();
-}
-
-function save(id, exerciseName, day) {
-    const val = document.getElementById('in-' + id).value;
-    if(!val) return;
-    const weightVal = parseFloat(val);
-    const dateShort = new Date().toLocaleDateString('no-NO', {day:'2-digit', month:'2-digit'});
-    
-    let localHistory = JSON.parse(localStorage.getItem('nsf_final_' + id)) || [];
-    const oldMax = localHistory.length > 0 ? Math.max(...localHistory.map(h => h.weight)) : 0;
-    const isNewPers = weightVal > oldMax && localHistory.length > 0;
-
-    localHistory.unshift({ weight: weightVal, date: dateShort, mood: currentMood });
-    localStorage.setItem('nsf_final_' + id, JSON.stringify(localHistory.slice(0, 10)));
-
-    fetch(SCRIPT_URL, {
-        method: 'POST', mode: 'no-cors',
-        body: JSON.stringify({ exercise: exerciseName + " " + (currentMood || ""), weight: val })
-    }).then(() => showStatus());
-
-    refreshCard(id, isNewPers, weightVal, dateShort, day);
-}
-
-function refreshCard(id, isNewPers, newWeight, newDate, day) {
-    const input = document.getElementById('in-' + id);
-    if (input) {
-        input.value = newWeight;
-        input.placeholder = 'Sist: ' + newWeight + ' kg';
-    }
-
-    const persEl = document.getElementById('pers-' + id);
-    if (persEl && isNewPers) persEl.style.display = 'flex';
-
-    const card = document.getElementById('card-' + id);
-    if (card) {
-        const dateEl = card.querySelector('.last-date');
-        if (dateEl) dateEl.textContent = newDate;
-    }
-
-    renderWeekBox();
-}
-
-const timerDurations = {};
-
-function setDur(id, seconds, el) {
-    timerDurations[id] = seconds;
-    el.closest('.timer-durations').querySelectorAll('.btn-dur').forEach(b => b.classList.remove('selected'));
-    el.classList.add('selected');
 }
 
 function startTimer(id) {
     const btn = document.getElementById('timer-' + id);
-    if (activeTimers[id]) {
-        clearInterval(activeTimers[id]);
-        delete activeTimers[id];
-        btn.innerText = 'Start pause';
-        btn.className = 'btn-timer';
-        return;
-    }
-    let timeLeft = timerDurations[id] || 120;
+    if (activeTimers[id]) { clearInterval(activeTimers[id]); delete activeTimers[id]; btn.innerText = 'Start pause (2m)'; btn.className = 'btn-timer'; return; }
+    
+    let timeLeft = 120;
     btn.classList.add('running');
-    btn.innerText = `${Math.floor(timeLeft/60)}:${(timeLeft%60).toString().padStart(2,'0')}`;
     activeTimers[id] = setInterval(() => {
         timeLeft--;
-        btn.innerText = `${Math.floor(timeLeft/60)}:${(timeLeft%60).toString().padStart(2,'0')}`;
+        btn.innerText = `Pause: ${Math.floor(timeLeft/60)}:${(timeLeft%60).toString().padStart(2,'0')}`;
         if (timeLeft <= 0) {
-            clearInterval(activeTimers[id]);
-            delete activeTimers[id];
-            btn.innerText = "KLAR! ✓";
-            btn.classList.replace('running', 'finished');
-            if(navigator.vibrate) navigator.vibrate([200, 100, 200]);
-            setTimeout(() => {
-                if (btn) { btn.innerText = 'Start pause'; btn.className = 'btn-timer'; }
-            }, 4000);
+            clearInterval(activeTimers[id]); delete activeTimers[id];
+            btn.innerText = "FERDIG! 💪"; btn.className = 'btn-timer finished';
+            if(navigator.vibrate) navigator.vibrate([300, 100, 300]);
         }
     }, 1000);
 }
 
-function renderNoteArea(day) {
-    const key = 'thomas_note_day' + day;
-    const notes = JSON.parse(localStorage.getItem(key)) || [];
-    const latest = notes[0] || null;
-    const savedText = latest ? latest.text : '';
-    const savedDate = latest ? latest.date : '';
-    document.getElementById('note-area').innerHTML = `
-        <div class="note-box">
-            <span class="note-label">📝 Notat for dag ${day}</span>
-            <textarea class="note-input" id="note-input-${day}" rows="2" placeholder="Hvordan gikk økten? Noe som kjentes tungt eller bra?">${savedText}</textarea>
-            <div class="note-footer">
-                <span class="note-saved">${savedDate ? 'Lagret ' + savedDate : 'Ikke lagret enda'}</span>
-                <button class="btn-note-save" onclick="saveNote('${day}')">Lagre notat</button>
-            </div>
-        </div>`;
+function setMood(emoji) {
+    currentMood = emoji;
+    document.querySelectorAll('.mood-btn').forEach(b => b.classList.toggle('active', b.innerText === emoji));
 }
 
-function saveNote(day) {
-    const key = 'thomas_note_day' + day;
-    const text = document.getElementById('note-input-' + day).value.trim();
-    if (!text) return;
-    const notes = JSON.parse(localStorage.getItem(key)) || [];
-    const dateShort = new Date().toLocaleDateString('no-NO', {day:'2-digit', month:'2-digit'});
-    notes.unshift({ text, date: dateShort });
-    localStorage.setItem(key, JSON.stringify(notes.slice(0, 10)));
-    renderNoteArea(day);
-}
-
-function renderWeekBox() {
-    const getMonday = (d) => {
-        const date = new Date(d);
-        const diff = (date.getDay() === 0 ? -6 : 1 - date.getDay());
-        date.setDate(date.getDate() + diff);
-        date.setHours(0,0,0,0);
-        return date.toISOString().split('T')[0];
-    };
-    const thisMonday = getMonday(new Date());
-    const lastMonday = (() => {
-        const d = new Date(thisMonday);
-        d.setDate(d.getDate() - 7);
-        return d.toISOString().split('T')[0];
-    })();
-
-    const countSetsForWeek = (monday) => {
-        const end = new Date(monday);
-        end.setDate(end.getDate() + 7);
-        let totalSets = 0, daysActive = new Set();
-        ['1','2','3'].forEach(d => {
-            program[d].forEach(ex => {
-                const hist = JSON.parse(localStorage.getItem('nsf_final_' + ex.id)) || [];
-                hist.forEach(h => {
-                    if (!h.date) return;
-                    const [dd, mm] = h.date.split('.');
-                    const year = new Date().getFullYear();
-                    const entryDate = new Date(year, mm-1, dd);
-                    const start = new Date(monday);
-                    if (entryDate >= start && entryDate < end) {
-                        totalSets++;
-                        daysActive.add(h.date);
-                    }
-                });
-            });
-        });
-        return { sets: totalSets, days: daysActive.size };
-    };
-
-    const thisWeek = countSetsForWeek(thisMonday);
-    const lastWeek = countSetsForWeek(lastMonday);
-
-    const diffSets = thisWeek.sets - lastWeek.sets;
-    const diffDays = thisWeek.days - lastWeek.days;
-    const fmtDiff = (n, unit) => {
-        if (n > 0) return `<span class="diff-up">▲ ${n} ${unit}</span>`;
-        if (n < 0) return `<span class="diff-down">▼ ${Math.abs(n)} ${unit}</span>`;
-        return `<span class="diff-same">= samme</span>`;
-    };
-
-    document.getElementById('week-box').innerHTML = `
-        <div class="week-title">📅 DENNE UKEN</div>
-        <div class="week-stats">
-            <div class="week-stat">
-                <div class="week-stat-val">${thisWeek.days}</div>
-                <div class="week-stat-lbl">Dager</div>
-                <div class="week-stat-diff">${fmtDiff(diffDays, '')}</div>
-            </div>
-            <div class="week-stat">
-                <div class="week-stat-val">${thisWeek.sets}</div>
-                <div class="week-stat-lbl">Loggede sett</div>
-                <div class="week-stat-diff">${fmtDiff(diffSets, 'sett')}</div>
-            </div>
-            <div class="week-stat">
-                <div class="week-stat-val">${lastWeek.sets}</div>
-                <div class="week-stat-lbl">Forrige uke</div>
-                <div class="week-stat-diff">&nbsp;</div>
-            </div>
-        </div>`;
+function save(id, name, day) {
+    const val = document.getElementById('in-' + id).value;
+    if(!val) return;
+    const date = new Date().toLocaleDateString('no-NO', {day:'2-digit', month:'2-digit'});
+    let hist = JSON.parse(localStorage.getItem('nsf_final_' + id)) || [];
+    hist.unshift({ weight: parseFloat(val), date, mood: currentMood });
+    localStorage.setItem('nsf_final_' + id, JSON.stringify(hist.slice(0, 10)));
+    
+    fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ exercise: name + " " + currentMood, weight: val }) });
+    showStatus();
+    updateView(day);
 }
 
 function showStatus() {
     const s = document.getElementById('status');
     s.style.display = 'block';
-    setTimeout(() => s.style.display = 'none', 3000);
-}
-
-function drawChart(id, title) {
-    const hist = JSON.parse(localStorage.getItem('nsf_final_' + id)) || [];
-    if (hist.length < 2) return;
-    const dataArray = [['Dato', 'Kg']];
-    [...hist].reverse().forEach(h => dataArray.push([h.date, parseFloat(h.weight)]));
-    const data = google.visualization.arrayToDataTable(dataArray);
-    const chart = new google.visualization.LineChart(document.getElementById('chart-' + id));
-    chart.draw(data, {
-        title: title, curveType: 'function', legend: 'none',
-        colors: ['#c0392b'], backgroundColor: 'transparent',
-        chartArea: { width: '85%', height: '70%' }
-    });
+    setTimeout(() => s.style.display = 'none', 2000);
 }
 
 function toggleHistory(id, title) {
     const area = document.getElementById('hist-area-' + id);
-    const isOpen = area.style.display === 'block';
-    area.style.display = isOpen ? 'none' : 'block';
-    if(!isOpen) {
-        setTimeout(() => drawChart(id, title), 100);
+    area.style.display = area.style.display === 'none' ? 'block' : 'none';
+    if(area.style.display === 'block') {
         const hist = JSON.parse(localStorage.getItem('nsf_final_' + id)) || [];
-        document.getElementById('hist-list-' + id).innerHTML = hist.map(h => `
-            <div class="history-item">
-                <span>${h.date} ${h.mood || ''}</span>
-                <strong>${h.weight} kg</strong>
-            </div>
-        `).join('') || 'Ingen logg';
+        document.getElementById('hist-list-' + id).innerHTML = hist.map(h => `<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);font-size:0.9em;"><span>${h.date} ${h.mood||''}</span><b>${h.weight} kg</b></div>`).join('');
     }
 }
 
-checkWeeklyReset();
+function renderNoteArea(day) {
+    const notes = JSON.parse(localStorage.getItem('thomas_note_day' + day)) || [];
+    document.getElementById('note-area').innerHTML = `<div class="card" style="border-left-color:var(--secondary)"><span class="ex-title">Notat for økten</span><textarea class="note-input" id="note-in-${day}" rows="2">${notes[0]?.text || ''}</textarea><button class="btn-save" style="margin-top:10px;background:var(--secondary)" onclick="saveNote('${day}')">Lagre notat</button></div>`;
+}
+
+function saveNote(day) {
+    const text = document.getElementById('note-in-' + day).value;
+    localStorage.setItem('thomas_note_day' + day, JSON.stringify([{text, date: new Date().toLocaleDateString()}]));
+    showStatus();
+}
+
+function resetAllSets(day) {
+    if(!confirm("Nullstille alle sirkler?")) return;
+    ['1','2','3'].forEach(d => program[d].forEach(ex => { for(let i=1; i<=10; i++) localStorage.removeItem(`thomas_v6_set_${ex.id}_${i}`); }));
+    updateView(day);
+}
+
+function renderWeekBox() {
+    const getSets = () => {
+        let count = 0;
+        ['1','2','3'].forEach(d => program[d].forEach(ex => {
+            for(let i=1; i<=10; i++) if(localStorage.getItem(`thomas_v6_set_${ex.id}_${i}`) === 'true') count++;
+        }));
+        return count;
+    };
+    document.getElementById('week-box').innerHTML = `<div style="font-size:0.8em;font-weight:bold;color:var(--secondary)">STATUS DENNE UKEN</div><div class="week-stats"><div class="week-stat"><div class="week-stat-val">${getSets()}</div><div class="week-stat-lbl">Fullførte sett</div></div><div class="week-stat"><div class="week-stat-val">3</div><div class="week-stat-lbl">Økter</div></div><div class="week-stat"><div class="week-stat-val">🔥</div><div class="week-stat-lbl">Status</div></div></div>`;
+}
+
 updateView(localStorage.getItem('thomas_last_day') || '1');
 </script>
 </body>
