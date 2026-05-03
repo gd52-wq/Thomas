@@ -1,337 +1,280 @@
-<!DOCTYPE html>
-<html lang="no">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Thomas' treningslogg Pro 💪🐾</title>
-    <script src="https://www.gstatic.com/charts/loader.js"></script>
-    <style>
-        :root { 
-            --primary: #c0392b; 
-            --secondary: #2c3e50; 
-            --card: rgba(255, 255, 255, 0.98);
-            --card-solid: #ffffff;
-            --success: #27ae60;
-            --gold: #f39c12;
-            --video: #2980b9;
-            --text: #1a1a1a;
-            --text-muted: #555;
-            --text-info: #333;
-            --border: #ddd;
-            --dot-border: #bdc3c7;
-            --dot-bg: #f8f9fa;
-            --dot-text: #555;
-            --history-bg: #f2f2f2;
-            --history-border: #ccc;
-            --week-bg: rgba(255,255,255,0.95);
-            --note-bg: #ffffff;
-            --note-border: #ccc;
-        }
+import React, { useState, useEffect } from 'react';
+import { Play, Pause, RotateCcw, Calendar, CheckCircle, ChevronRight, Clock, ArrowLeft, Plus } from 'lucide-react';
 
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --card: #1c222d;
-                --card-solid: #1c222d;
-                --text: #ffffff;
-                --text-muted: #a0aab8;
-                --text-info: #d1d5db;
-                --border: #374151;
-                --dot-border: #4b5563;
-                --dot-bg: #2d3748;
-                --dot-text: #e5e7eb;
-                --history-bg: #111827;
-                --history-border: #374151;
-                --week-bg: #1c222d;
-                --note-bg: #111827;
-                --note-border: #374151;
-                --secondary: #94a3b8;
-            }
-            body { background-blend-mode: multiply; background-color: #111; }
-        }
-        
-        body { 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
-            margin: 0; padding: 10px; min-height: 100vh;
-            background: url('bedlington.jpg') no-repeat center center fixed; 
-            background-size: cover;
-            color: var(--text);
-            line-height: 1.4;
-        }
-
-        .header { 
-            text-align: center; padding: 15px 0; background: rgba(0, 0, 0, 0.75); 
-            color: white; border-radius: 12px; margin-bottom: 15px;
-        }
-
-        .container { max-width: 500px; margin: auto; }
-
-        .mood-box { background: var(--card); padding: 15px; border-radius: 12px; margin-bottom: 15px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-        .mood-options { display: flex; justify-content: space-around; margin-top: 10px; }
-        .mood-btn { font-size: 2em; cursor: pointer; border: 2px solid transparent; border-radius: 12px; padding: 8px; background: var(--dot-bg); transition: 0.2s; }
-        .mood-btn.active { border-color: var(--primary); background: rgba(192, 57, 43, 0.2); transform: scale(1.1); }
-
-        .day-selector { display: flex; justify-content: space-between; gap: 8px; margin-bottom: 15px; }
-        .btn-day { 
-            flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
-            height: 70px; border-radius: 12px; border: none; background: var(--card-solid); 
-            color: var(--text); font-weight: bold; font-size: 1.1em; box-shadow: 0 4px 6px rgba(0,0,0,0.2); cursor: pointer;
-        }
-        .btn-day-sub { font-size: 0.5em; font-weight: normal; color: var(--text-muted); margin-top: 4px; }
-        .btn-day.active { background: var(--primary); color: white; }
-        .btn-day.active .btn-day-sub { color: rgba(255,255,255,0.9); }
-
-        .card { 
-            background: var(--card); border-radius: 15px; padding: 18px; margin-bottom: 15px; 
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15); border-left: 6px solid var(--primary); position: relative;
-        }
-
-        .pers-badge { position: absolute; top: 12px; right: 12px; color: var(--gold); font-weight: bold; font-size: 0.8em; display: none; align-items: center; gap: 4px; }
-
-        .set-tracker { display: flex; gap: 10px; margin: 15px 0; align-items: center; flex-wrap: wrap; }
-        .set-dot { 
-            width: 34px; height: 34px; border: 2px solid var(--dot-border); border-radius: 50%; 
-            cursor: pointer; display: flex; align-items: center; justify-content: center; 
-            font-size: 0.9em; color: var(--dot-text); font-weight: bold; background: var(--dot-bg);
-        }
-        .set-dot.done { background: var(--success); border-color: var(--success); color: white; }
-
-        .ex-title { font-weight: 800; color: var(--text); font-size: 1.2em; display: block; margin-bottom: 4px; }
-        .ex-info { font-size: 1em; color: var(--primary); margin-bottom: 6px; font-weight: bold; }
-        .ex-desc { font-size: 0.9em; color: var(--text-muted); margin-bottom: 10px; }
-
-        .video-btn { 
-            display: inline-flex; align-items: center; gap: 5px; margin-top: 8px; padding: 6px 12px;
-            background: var(--video); color: white; text-decoration: none; border-radius: 6px;
-            font-size: 0.8em; font-weight: bold;
-        }
-
-        .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
-        input[type=number] { width: 100%; padding: 12px; border: 2px solid var(--border); border-radius: 10px; font-size: 18px; box-sizing: border-box; background: var(--dot-bg); color: var(--text); }
-        .btn-save { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 10px; font-weight: bold; font-size: 16px; }
-        
-        .timer-container { grid-column: span 2; margin-top: 5px; }
-        .btn-timer { width: 100%; padding: 14px; background: var(--secondary); color: white; border: none; border-radius: 10px; font-size: 1em; font-weight: bold; }
-        .btn-timer.running { background: #e67e22; }
-        .btn-timer.finished { background: var(--success); }
-
-        .btn-reset-day { background: #666; color: white; border: none; padding: 18px; border-radius: 12px; font-weight: bold; width: 100%; margin: 20px 0 50px 0; }
-
-        .footer-btns { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; border-top: 1px solid var(--border); padding-top: 12px; }
-        .btn-small { background: transparent; border: 1px solid var(--dot-border); font-size: 0.8em; padding: 8px 12px; color: var(--text-muted); border-radius: 8px; }
-        .last-date { font-size: 0.8em; color: var(--text-muted); }
-
-        .week-box { background: var(--week-bg); border-radius: 12px; margin-bottom: 15px; padding: 15px; border-left: 6px solid var(--secondary); }
-        .week-stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 10px; }
-        .week-stat { background: var(--history-bg); border-radius: 10px; padding: 10px; text-align: center; }
-        .week-stat-val { font-size: 1.4em; font-weight: 900; color: var(--primary); }
-        .week-stat-lbl { font-size: 0.7em; text-transform: uppercase; color: var(--text-muted); }
-
-        .note-input { width: 100%; box-sizing: border-box; padding: 12px; border-radius: 10px; border: 2px solid var(--note-border); background: var(--note-bg); color: var(--text); font-size: 16px; margin-top: 10px; }
-        .status-msg { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--success); color: white; padding: 12px 30px; border-radius: 30px; font-weight: bold; z-index: 2000; box-shadow: 0 5px 15px rgba(0,0,0,0.3); display: none; }
-    </style>
-</head>
-<body>
-
-<div id="status" class="status-msg">✅ Lagret!</div>
-
-<div class="container">
-    <div class="header">
-        <h2 style="margin:0">Thomas' treningslogg</h2>
-    </div>
-
-    <div class="mood-box">
-        <div style="font-weight: bold; color: var(--text-muted); font-size: 0.9em;">Dagens dagsform?</div>
-        <div class="mood-options">
-            <button class="mood-btn" onclick="setMood('⚡')">⚡</button>
-            <button class="mood-btn" onclick="setMood('💪')">💪</button>
-            <button class="mood-btn" onclick="setMood('😴')">😴</button>
-            <button class="mood-btn" onclick="setMood('🤕')">🤕</button>
-        </div>
-    </div>
-
-    <div id="week-box" class="week-box"></div>
-
-    <div class="day-selector">
-        <button id="btn-1" class="btn-day" onclick="updateView('1')">DAG 1<span class="btn-day-sub">Beinpress</span></button>
-        <button id="btn-2" class="btn-day" onclick="updateView('2')">DAG 2<span class="btn-day-sub">Isolasjon Bein</span></button>
-        <button id="btn-3" class="btn-day" onclick="updateView('3')">DAG 3<span class="btn-day-sub">Glutes & Bryst</span></button>
-    </div>
-
-    <div id="note-area"></div>
-    <div id="workoutContent"></div>
-</div>
-
-<script>
-google.charts.load('current', {'packages':['corechart']});
-
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby4uPV4nt98q4WdNB35VVkwJPqaiX5kXLQK5VMK3ZNsQ9jlSTSXg_0-S9H1jiqRiOFJ1w/exec'; 
-let currentMood = "";
-let activeTimers = {};
-
-const program = {
-    "1": [
-        { id: "tm1", t: "Magen", i: "3x30", d: "Valgfri (Situps/Benhev).", v: "", timer: false },
-        { id: "tm2", t: "Rygghev", i: "3x12-15", d: "Hold vektskive inntil brystet.", v: "", timer: false },
-        { id: "tm3_bp", t: "Beinpress i Maskin (TUNG)", i: "1x8, 2x6, 2x5", d: "Plasser føttene høyt på platen for å skåne knærne.", v: "", timer: true },
-        { id: "tm4", t: "Benkpress m/stopp", i: "2x6, 2x5, 2x3", d: "1 sek stopp på brystet.", v: "", timer: true },
-        { id: "tm5", t: "Sittende Lårcurl", i: "3x12", d: "Isolert bakside lår - snilt for kneet.", v: "", timer: false },
-        { id: "tm6", t: "Frontpress", i: "1x6, 2x5, 2x4", d: "Stående skulderpress.", v: "", timer: true }
-    ],
-    "2": [
-        { id: "to1", t: "Magen", i: "3x20", d: "Kontrollert.", v: "", timer: false },
-        { id: "to2", t: "Rygghev", i: "3x10-12", d: "Litt tyngre.", v: "", timer: false },
-        { id: "to3_le", t: "Leg Extension (Beinspark)", i: "3x10-12", d: "Isolerer fremside lår uten at hoften/korsryggen belastes.", v: "", timer: true },
-        { id: "to4", t: "Benkpress m/stopp", i: "1x8, 2x6, 2x5, 2x4", d: "Husk stopp.", v: "", timer: true },
-        { id: "to5_lc", t: "Liggende Lårcurl", i: "4x8-10", d: "Isolert bakside lår. Veldig god og skånsom erstatning for markløft.", v: "", timer: true }
-    ],
-    "3": [
-        { id: "tf1", t: "Magen", i: "3x25", d: "Kjernefokus.", v: "", timer: false },
-        { id: "tf2", t: "Rygghev", i: "3x8-10", d: "Ukens tyngste.", v: "", timer: false },
-        { id: "tf3_ebp", t: "Ettbeins Beinpress", i: "3x8 per bein", d: "Fokus på jevn styrke og kontrollert bevegelse.", v: "", timer: true },
-        { id: "tf4", t: "Smal benkpress", i: "1x6, 2x5, 3x4", d: "Skulderbredde.", v: "", timer: true },
-        { id: "tf5_ht", t: "Hip Thrust (Maskin/Smith)", i: "4x6-8", d: "Skånsomt for korsrygg og knær, men trener setemusklene kraftig.", v: "", timer: true },
-        { id: "tf6", t: "Nakkepress", i: "5x4-6", d: "Fra nakken.", v: "", timer: true }
+// Treningsdata fra ditt originale program, supplert med trekkøvelser
+const WORKOUTS = [
+  {
+    id: 'dag-1',
+    title: 'Dag 1: Beinpress (+ Trekk)',
+    description: 'Tung beinpress, benkpress og frontpress. Lagt til kabelroing for rygg.',
+    exercises: [
+      { id: 'tm1', name: 'Magen', sets: 3, reps: '30', rest: 60, desc: 'Valgfri (Situps/Benhev).' },
+      { id: 'tm2', name: 'Rygghev', sets: 3, reps: '12-15', rest: 60, desc: 'Hold vektskive inntil brystet.' },
+      { id: 'tm3_bp', name: 'Beinpress i Maskin (TUNG)', sets: 5, reps: '1x8, 2x6, 2x5', rest: 120, desc: 'Plasser føttene høyt på platen for å skåne knærne.' },
+      { id: 'tm4', name: 'Benkpress m/stopp', sets: 6, reps: '2x6, 2x5, 2x3', rest: 120, desc: '1 sek stopp på brystet.' },
+      { id: 'tm5', name: 'Sittende Lårcurl', sets: 3, reps: '12', rest: 90, desc: 'Isolert bakside lår - snilt for kneet.' },
+      { id: 'tm6', name: 'Frontpress', sets: 5, reps: '1x6, 2x5, 2x4', rest: 90, desc: 'Stående skulderpress.' },
+      { id: 'new_pull1', name: 'Sittende kabelroing', sets: 3, reps: '8-12', rest: 90, desc: 'NY: Horisontalt trekk for midtre rygg og holdning.' }
     ]
-};
+  },
+  {
+    id: 'dag-2',
+    title: 'Dag 2: Isolasjon Bein (+ Trekk)',
+    description: 'Isolasjon for bein og mer benkpress. Lagt til nedtrekk og face pulls.',
+    exercises: [
+      { id: 'to1', name: 'Magen', sets: 3, reps: '20', rest: 60, desc: 'Kontrollert.' },
+      { id: 'to2', name: 'Rygghev', sets: 3, reps: '10-12', rest: 60, desc: 'Litt tyngre.' },
+      { id: 'to3_le', name: 'Leg Extension (Beinspark)', sets: 3, reps: '10-12', rest: 90, desc: 'Isolerer fremside lår uten at hoften/korsryggen belastes.' },
+      { id: 'to4', name: 'Benkpress m/stopp', sets: 7, reps: '1x8, 2x6, 2x5, 2x4', rest: 120, desc: 'Husk stopp.' },
+      { id: 'to5_lc', name: 'Liggende Lårcurl', sets: 4, reps: '8-10', rest: 90, desc: 'Isolert bakside lår. Veldig god og skånsom erstatning for markløft.' },
+      { id: 'new_pull2', name: 'Nedtrekk (eller Pull-ups)', sets: 3, reps: '8-10', rest: 90, desc: 'NY: Vertikalt trekk for bredde i ryggen.' },
+      { id: 'new_pull3', name: 'Face pulls', sets: 3, reps: '12-15', rest: 60, desc: 'NY: For bakside skulder, ekstremt bra for skulderhelse!' }
+    ]
+  },
+  {
+    id: 'dag-3',
+    title: 'Dag 3: Glutes & Bryst (+ Trekk)',
+    description: 'Fokus på setemuskler og smal benkpress. Lagt til stangroing.',
+    exercises: [
+      { id: 'tf1', name: 'Magen', sets: 3, reps: '25', rest: 60, desc: 'Kjernefokus.' },
+      { id: 'tf2', name: 'Rygghev', sets: 3, reps: '8-10', rest: 60, desc: 'Ukens tyngste.' },
+      { id: 'tf3_ebp', name: 'Ettbeins Beinpress', sets: 3, reps: '8 per bein', rest: 90, desc: 'Fokus på jevn styrke og kontrollert bevegelse.' },
+      { id: 'tf4', name: 'Smal benkpress', sets: 6, reps: '1x6, 2x5, 3x4', rest: 120, desc: 'Skulderbredde.' },
+      { id: 'tf5_ht', name: 'Hip Thrust (Maskin/Smith)', sets: 4, reps: '6-8', rest: 120, desc: 'Skånsomt for korsrygg og knær, men trener setemusklene kraftig.' },
+      { id: 'tf6', name: 'Skuledpress', sets: 5, reps: '4-6', rest: 90, desc: 'Nakkevenlig.' },
+      { id: 'new_pull4', name: 'Stående stangroing', sets: 3, reps: '8-10', rest: 90, desc: 'NY: Tykkelse i ryggen og balanserende for all brysttreningen.' }
+    ]
+  }
+];
 
-function getSetCount(infoString) {
-    let totalSets = 0;
-    infoString.split(',').forEach(part => {
-        const match = part.match(/(\d+)x/);
-        if (match) totalSets += parseInt(match[1]);
-    });
-    return totalSets || 3;
-}
+export default function App() {
+  const [activeWorkoutId, setActiveWorkoutId] = useState(null);
+  const [workoutHistory, setWorkoutHistory] = useState({}); // Lagrer dato for sist gjennomført
+  
+  // Timer State (ligger på toppnivå så den ikke nullstilles når man bytter visning)
+  const [timeLeft, setTimeLeft] = useState(0);
+  const [isTimerRunning, setIsTimerRunning] = useState(false);
+  const [timerMax, setTimerMax] = useState(90);
 
-function toggleSet(exId, setNum, element) {
-    element.classList.toggle('done');
-    localStorage.setItem(`thomas_v6_set_${exId}_${setNum}`, element.classList.contains('done'));
-}
+  // Set tracking per økt
+  const [completedSets, setCompletedSets] = useState({});
 
-function updateView(day) {
-    localStorage.setItem('thomas_last_day', day);
-    document.querySelectorAll('.btn-day').forEach(b => b.classList.toggle('active', b.id === 'btn-'+day));
-
-    const container = document.getElementById('workoutContent');
-    container.innerHTML = program[day].map(ex => {
-        const hist = JSON.parse(localStorage.getItem('nsf_final_' + ex.id)) || [];
-        const lastWeight = hist.length > 0 ? hist[0].weight : "";
-        const lastDate = hist.length > 0 ? hist[0].date : "Ingen logg";
-        
-        let dots = "";
-        for(let i = 1; i <= getSetCount(ex.i); i++) {
-            const done = localStorage.getItem(`thomas_v6_set_${ex.id}_${i}`) === 'true' ? 'done' : '';
-            dots += `<div class="set-dot ${done}" onclick="toggleSet('${ex.id}', ${i}, this)">${i}</div>`;
-        }
-
-        return `
-        <div class="card" id="card-${ex.id}">
-            <div id="pers-${ex.id}" class="pers-badge">🌟 NY PERS!</div>
-            <span class="ex-title">${ex.t}</span>
-            <div class="ex-info">${ex.i}</div>
-            <div class="ex-desc">${ex.d} ${ex.v ? `<br><a href="${ex.v}" target="_blank" class="video-btn">Video 🎥</a>` : ''}</div>
-            
-            <div class="set-tracker">${dots}</div>
-
-            <div class="input-row">
-                <input type="number" id="in-${ex.id}" placeholder="${lastWeight || 'Kg'}" inputmode="decimal" value="${lastWeight}">
-                <button class="btn-save" onclick="save('${ex.id}', '${ex.t}', '${day}')">Lagre</button>
-                ${ex.timer ? `<div class="timer-container"><button id="timer-${ex.id}" class="btn-timer" onclick="startTimer('${ex.id}')">Start pause (2m)</button></div>` : ''}
-            </div>
-            <div class="footer-btns">
-                <button class="btn-small" onclick="toggleHistory('${ex.id}', '${ex.t}')">Historikk</button>
-                <span class="last-date">Sist: ${lastDate}</span>
-            </div>
-            <div class="history-area" id="hist-area-${ex.id}" style="display:none">
-                <div id="chart-${ex.id}" class="chart-div"></div>
-                <div id="hist-list-${ex.id}"></div>
-            </div>
-        </div>`;
-    }).join('') + `<button class="btn-reset-day" onclick="resetAllSets('${day}')">🔄 Nullstill sirkler for ny uke</button>`;
-    
-    renderNoteArea(day);
-    renderWeekBox();
-}
-
-function startTimer(id) {
-    const btn = document.getElementById('timer-' + id);
-    if (activeTimers[id]) { clearInterval(activeTimers[id]); delete activeTimers[id]; btn.innerText = 'Start pause (2m)'; btn.className = 'btn-timer'; return; }
-    
-    let timeLeft = 120;
-    btn.classList.add('running');
-    activeTimers[id] = setInterval(() => {
-        timeLeft--;
-        btn.innerText = `Pause: ${Math.floor(timeLeft/60)}:${(timeLeft%60).toString().padStart(2,'0')}`;
-        if (timeLeft <= 0) {
-            clearInterval(activeTimers[id]); delete activeTimers[id];
-            btn.innerText = "FERDIG! 💪"; btn.className = 'btn-timer finished';
-            if(navigator.vibrate) navigator.vibrate([300, 100, 300]);
-        }
-    }, 1000);
-}
-
-function setMood(emoji) {
-    currentMood = emoji;
-    document.querySelectorAll('.mood-btn').forEach(b => b.classList.toggle('active', b.innerText === emoji));
-}
-
-function save(id, name, day) {
-    const val = document.getElementById('in-' + id).value;
-    if(!val) return;
-    const date = new Date().toLocaleDateString('no-NO', {day:'2-digit', month:'2-digit'});
-    let hist = JSON.parse(localStorage.getItem('nsf_final_' + id)) || [];
-    hist.unshift({ weight: parseFloat(val), date, mood: currentMood });
-    localStorage.setItem('nsf_final_' + id, JSON.stringify(hist.slice(0, 10)));
-    
-    fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ exercise: name + " " + currentMood, weight: val }) });
-    showStatus();
-    updateView(day);
-}
-
-function showStatus() {
-    const s = document.getElementById('status');
-    s.style.display = 'block';
-    setTimeout(() => s.style.display = 'none', 2000);
-}
-
-function toggleHistory(id, title) {
-    const area = document.getElementById('hist-area-' + id);
-    area.style.display = area.style.display === 'none' ? 'block' : 'none';
-    if(area.style.display === 'block') {
-        const hist = JSON.parse(localStorage.getItem('nsf_final_' + id)) || [];
-        document.getElementById('hist-list-' + id).innerHTML = hist.map(h => `<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);font-size:0.9em;"><span>${h.date} ${h.mood||''}</span><b>${h.weight} kg</b></div>`).join('');
+  // Robust timer-logikk som ikke stopper uventet
+  useEffect(() => {
+    let intervalId;
+    if (isTimerRunning && timeLeft > 0) {
+      intervalId = setInterval(() => {
+        setTimeLeft((prev) => prev - 1);
+      }, 1000);
+    } else if (timeLeft === 0 && isTimerRunning) {
+      setIsTimerRunning(false);
     }
-}
-
-function renderNoteArea(day) {
-    const notes = JSON.parse(localStorage.getItem('thomas_note_day' + day)) || [];
-    document.getElementById('note-area').innerHTML = `<div class="card" style="border-left-color:var(--secondary)"><span class="ex-title">Notat for økten</span><textarea class="note-input" id="note-in-${day}" rows="2">${notes[0]?.text || ''}</textarea><button class="btn-save" style="margin-top:10px;background:var(--secondary)" onclick="saveNote('${day}')">Lagre notat</button></div>`;
-}
-
-function saveNote(day) {
-    const text = document.getElementById('note-in-' + day).value;
-    localStorage.setItem('thomas_note_day' + day, JSON.stringify([{text, date: new Date().toLocaleDateString()}]));
-    showStatus();
-}
-
-function resetAllSets(day) {
-    if(!confirm("Nullstille alle sirkler?")) return;
-    ['1','2','3'].forEach(d => program[d].forEach(ex => { for(let i=1; i<=10; i++) localStorage.removeItem(`thomas_v6_set_${ex.id}_${i}`); }));
-    updateView(day);
-}
-
-function renderWeekBox() {
-    const getSets = () => {
-        let count = 0;
-        ['1','2','3'].forEach(d => program[d].forEach(ex => {
-            for(let i=1; i<=10; i++) if(localStorage.getItem(`thomas_v6_set_${ex.id}_${i}`) === 'true') count++;
-        }));
-        return count;
+    
+    // Rydder opp intervallet hver gang effekten kjører
+    return () => {
+      if (intervalId) clearInterval(intervalId);
     };
-    document.getElementById('week-box').innerHTML = `<div style="font-size:0.8em;font-weight:bold;color:var(--secondary)">STATUS DENNE UKEN</div><div class="week-stats"><div class="week-stat"><div class="week-stat-val">${getSets()}</div><div class="week-stat-lbl">Fullførte sett</div></div><div class="week-stat"><div class="week-stat-val">3</div><div class="week-stat-lbl">Økter</div></div><div class="week-stat"><div class="week-stat-val">🔥</div><div class="week-stat-lbl">Status</div></div></div>`;
-}
+  }, [isTimerRunning, timeLeft]);
 
-updateView(localStorage.getItem('thomas_last_day') || '1');
-</script>
-</body>
-</html>
+  // Timer-funksjoner
+  const startTimer = (seconds) => {
+    setTimeLeft(seconds);
+    setTimerMax(seconds);
+    setIsTimerRunning(true);
+  };
+
+  const toggleTimer = () => {
+    if (timeLeft > 0) setIsTimerRunning(!isTimerRunning);
+  };
+
+  const resetTimer = () => {
+    setIsTimerRunning(false);
+    setTimeLeft(timerMax);
+  };
+
+  const formatTime = (seconds) => {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${m}:${s.toString().padStart(2, '0')}`;
+  };
+
+  // Trenings-funksjoner
+  const toggleSet = (exerciseId, setIndex) => {
+    const key = `${activeWorkoutId}-${exerciseId}-${setIndex}`;
+    setCompletedSets(prev => ({
+      ...prev,
+      [key]: !prev[key]
+    }));
+  };
+
+  const finishWorkout = () => {
+    const today = new Date().toLocaleDateString('no-NO', { 
+      weekday: 'long', 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    });
+    
+    // Lagre dato for denne økten
+    setWorkoutHistory(prev => ({
+      ...prev,
+      [activeWorkoutId]: today
+    }));
+    
+    // Nullstill set-tracking for neste gang
+    setCompletedSets({});
+    setActiveWorkoutId(null);
+  };
+
+  const activeWorkout = WORKOUTS.find(w => w.id === activeWorkoutId);
+
+  // Skjerm 1: Hovedmeny / Velg økt
+  if (!activeWorkoutId) {
+    return (
+      <div className="min-h-screen bg-slate-50 text-slate-800 p-4 md:p-8 font-sans">
+        <div className="max-w-2xl mx-auto">
+          <header className="mb-8 text-center md:text-left">
+            <h1 className="text-3xl font-bold text-slate-900 mb-2">Treningsprogram</h1>
+            <p className="text-slate-600">Velg dagens økt og spor fremgangen din.</p>
+          </header>
+
+          <div className="space-y-4">
+            {WORKOUTS.map((workout) => (
+              <button
+                key={workout.id}
+                onClick={() => setActiveWorkoutId(workout.id)}
+                className="w-full bg-white p-6 rounded-2xl shadow-sm border border-slate-200 hover:shadow-md transition-shadow text-left group flex flex-col md:flex-row md:items-center justify-between"
+              >
+                <div>
+                  <h2 className="text-xl font-bold text-indigo-600 mb-1">{workout.title}</h2>
+                  <p className="text-slate-500 text-sm mb-3 md:mb-0">{workout.description}</p>
+                </div>
+                
+                <div className="flex items-center gap-4 text-sm">
+                  {workoutHistory[workout.id] ? (
+                    <div className="flex items-center text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-full">
+                      <CheckCircle className="w-4 h-4 mr-2" />
+                      Sist: {workoutHistory[workout.id].split(',')[0]} {/* Viser bare ukedagen */}
+                    </div>
+                  ) : (
+                    <div className="flex items-center text-slate-400 bg-slate-100 px-3 py-1.5 rounded-full">
+                      <Calendar className="w-4 h-4 mr-2" />
+                      Ikke registrert
+                    </div>
+                  )}
+                  <ChevronRight className="w-5 h-5 text-slate-300 group-hover:text-indigo-500 transition-colors hidden md:block" />
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Skjerm 2: Aktiv Økt
+  return (
+    <div className="min-h-screen bg-slate-50 text-slate-800 pb-32 font-sans">
+      {/* Header for aktiv økt */}
+      <div className="bg-white border-b border-slate-200 sticky top-0 z-10">
+        <div className="max-w-2xl mx-auto p-4 flex items-center justify-between">
+          <button 
+            onClick={() => setActiveWorkoutId(null)}
+            className="p-2 hover:bg-slate-100 rounded-full transition-colors flex items-center text-slate-600"
+          >
+            <ArrowLeft className="w-5 h-5 mr-1" />
+            <span className="hidden md:inline">Tilbake</span>
+          </button>
+          <h2 className="text-lg font-bold text-slate-900 truncate px-4">{activeWorkout.title}</h2>
+          <div className="w-20"></div> {/* Spacer for centering */}
+        </div>
+      </div>
+
+      <div className="max-w-2xl mx-auto p-4 space-y-6 mt-4">
+        {/* Øvelser */}
+        {activeWorkout.exercises.map((exercise) => (
+          <div key={exercise.id} className="bg-white rounded-2xl p-5 shadow-sm border border-slate-200">
+            <div className="flex justify-between items-start mb-4">
+              <div>
+                <h3 className="text-lg font-bold text-slate-900">{exercise.name}</h3>
+                <p className="text-sm font-medium text-slate-500 mt-1">
+                  {exercise.sets} sett | Reps: {exercise.reps}
+                </p>
+                {exercise.desc && (
+                  <p className="text-sm text-slate-600 mt-2 bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                    💡 {exercise.desc}
+                  </p>
+                )}
+              </div>
+              <button 
+                onClick={() => startTimer(exercise.rest)}
+                className="flex items-center gap-1.5 text-xs font-semibold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-3 py-2 rounded-lg transition-colors"
+              >
+                <Clock className="w-4 h-4" />
+                {exercise.rest}s hvile
+              </button>
+            </div>
+
+            {/* Sett-trackers */}
+            <div className="flex flex-wrap gap-3">
+              {Array.from({ length: exercise.sets }).map((_, i) => {
+                const isChecked = completedSets[`${activeWorkout.id}-${exercise.id}-${i}`];
+                return (
+                  <button
+                    key={i}
+                    onClick={() => toggleSet(exercise.id, i)}
+                    className={`w-12 h-12 rounded-xl text-lg font-bold flex items-center justify-center transition-all ${
+                      isChecked 
+                        ? 'bg-emerald-500 text-white shadow-inner shadow-emerald-700/20' 
+                        : 'bg-slate-100 text-slate-400 hover:bg-slate-200 border-2 border-slate-200'
+                    }`}
+                  >
+                    {isChecked ? <CheckCircle className="w-6 h-6" /> : i + 1}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        ))}
+
+        {/* Fullfør-knapp */}
+        <button 
+          onClick={finishWorkout}
+          className="w-full mt-8 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-lg py-4 rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2"
+        >
+          <CheckCircle className="w-6 h-6" />
+          Registrer og avslutt økt
+        </button>
+      </div>
+
+      {/* Flytende Timer (Fast i bunnen av skjermen) */}
+      {(timeLeft > 0 || isTimerRunning) && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[90%] max-w-sm bg-slate-900 text-white rounded-2xl shadow-2xl p-4 flex items-center justify-between border border-slate-700 z-50">
+          <div className="flex items-center gap-3">
+            <div className={`text-3xl font-mono font-bold ${timeLeft === 0 ? 'text-rose-400' : 'text-emerald-400'}`}>
+              {formatTime(timeLeft)}
+            </div>
+            <div className="text-xs text-slate-400 font-medium uppercase tracking-wider">
+              {timeLeft === 0 ? 'Ferdig!' : 'Hvile'}
+            </div>
+          </div>
+          
+          <div className="flex gap-2">
+            <button 
+              onClick={toggleTimer}
+              className="p-3 bg-slate-800 hover:bg-slate-700 rounded-xl transition-colors"
+            >
+              {isTimerRunning ? <Pause className="w-5 h-5 text-white" /> : <Play className="w-5 h-5 text-white" />}
+            </button>
+            <button 
+              onClick={resetTimer}
+              className="p-3 bg-slate-800 hover:bg-slate-700 rounded-xl transition-colors"
+            >
+              <RotateCcw className="w-5 h-5 text-white" />
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
